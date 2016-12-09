@@ -1,4 +1,4 @@
-CPPFLAGS=-g -O3 -std=c++0x -Wall -I./includes/ -I/usr/include/hdf5/serial/
+CPPFLAGS=-ggdb -Og -std=c++0x -Wall -I./includes/ -I/usr/include/hdf5/serial/
 LDFLAGS=-g -Wall -L/usr/lib/x86_64-linux-gnu/hdf5/serial
 LDLIBS=-lm -lgsl -lgslcblas -lhdf5
 
