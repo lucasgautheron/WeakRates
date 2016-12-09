@@ -16,13 +16,7 @@ void read_ls_eos_table_hdf_cpp (const char *table, int *m_ln_rho, int *n_ln_t, i
   
   
   // open file
-  if(*kflag ==1) {
-    file = H5Fopen ("EOS/eosls180.h5", H5F_ACC_RDONLY, H5P_DEFAULT);}
-  if(*kflag ==2) {
-    file = H5Fopen ("EOS/eosls220.h5", H5F_ACC_RDONLY, H5P_DEFAULT);}
-  if(*kflag ==3) {
-    file = H5Fopen ("EOS/eosls375.h5", H5F_ACC_RDONLY, H5P_DEFAULT);}
-
+  file = H5Fopen (table, H5F_ACC_RDONLY, H5P_DEFAULT);
    
   // read data sets
   dataset = H5Dopen (file, "pointsrho");
@@ -96,16 +90,22 @@ void read_ls_eos_table_hdf_cpp (const char *table, int *m_ln_rho, int *n_ln_t, i
   status = H5Fclose (file);
 }
 
-
-nuclear_array nuclear_table;
-
 int main(int argc, const char *argv[])
 {
     // read EOS table
     // read abundances
     // browse EOS table and compute rates
 
-    read_nuclear_data("data/mass.mas12", nuclear_table);
+    int entries = 0;
+
+    // Read nuclear data (masses)
+    entries = read_nuclear_data("data/mass.mas12");
+    std::cout << "Read " << entries << " nuclear data entries\n";
+
+    // Read abundance data
+    entries = read_abundance_data("data/EOS.compo", "data/EOS.t", "data/EOS.nb", "data/EOS.yq");
+    std::cout << "Read " << entries << " nuclear abundance data entries\n";
+
     nucleus_scattering_cross_section(1, 1, 10, 0);
 
     return 0;

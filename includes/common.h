@@ -1,3 +1,4 @@
+#include <iostream>
 #include <sstream>
 #include <fstream>
 #include <string>
@@ -17,3 +18,4 @@
 #include "constants.h"
 #include "nuclear.h"
 #include "physics.h"
+#include "abundances.h"

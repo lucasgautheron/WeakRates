@@ -29,24 +29,4 @@ inline double beta_decay_Q(int A, int Z)
     return nuclear_table[mother]->m - nuclear_table[daughter]->m;
 }
 
-int read_nuclear_data(const char *path, nuclear_array &table)
-{
-    std::ifstream infile(path);
-    int count = 0;
-    std::string line;
-    std::istringstream iss;
-    while (std::getline(infile, line)) {
-        const char *str = line.c_str();
-        int Z = atoi(str+11);
-        int A = atoi(str+15);
-        int base = atoi(str+96);
-        double m = double(base) + 1e-6 * strtod(str+100, NULL);
-        m *= MASS_UNIT;
-        double beta_q = strtod(str+79, NULL)/1e3;
-        //printf("%d %d %e %.3f\n", Z, A, m, beta_q);
-        std::array<int, 2> elem = { A, Z };
-        table[elem] = new nuclear_data(A, Z, m, beta_q);
-        ++count;
-    }
-    return count;
-}
+int read_nuclear_data(const char *path);
