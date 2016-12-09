@@ -107,8 +107,6 @@ int read_abundance_data(const char *path_abundances, const char *path_temperatur
         ab->elements.push_back(neutron);
         ab->elements.push_back(proton);
 
-        
-
         std::array<int, 3> conditions = {ab->idx[0], ab->idx[1], ab->idx[2]};
         table.abundances[conditions] = ab;
         ++count;
@@ -155,7 +153,7 @@ double element_abundance(int A, int Z, double params[3], double *vlow, double *v
 
     double v_next = 0;
     {
-        abundance_data *ptr = table.abundances[upper];
+        abundance_data *ptr = table.abundances.count(upper) ? table.abundances[upper] : NULL;
         if(!ptr) v_next = v;
         else
         {
