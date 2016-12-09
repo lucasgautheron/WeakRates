@@ -106,6 +106,7 @@ int main(int argc, const char *argv[])
     // browse EOS table and compute rates
 
     read_nuclear_data("data/mass.mas12", nuclear_table);
+    nucleus_scattering_cross_section(1, 1, 10, 0);
 
     return 0;
 }
