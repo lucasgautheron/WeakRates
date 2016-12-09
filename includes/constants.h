@@ -1,0 +1,7 @@
+#define ALPHA 0.00729735256
+#define ATOMIC_RADIUS 1.25
+#define M_ELECTRON 0.511 // MeV
+#define HBARC 197.3269788  // MeV.fm 
+#define FERMI_COUPLING 1.1663787e-11 // MeV^-2
+#define CELERITY 2.99792458e23 // fm/s
+#define MASS_UNIT 931.4940954 // MeV
