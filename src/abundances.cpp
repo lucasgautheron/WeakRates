@@ -35,7 +35,7 @@ struct index_entry
     double val;
 };
 
-inline int nucleus_to_AZ(int nucleus, int &A, int &Z)
+inline void nucleus_to_AZ(int nucleus, int &A, int &Z)
 {
     A = nucleus/1000;
     Z = nucleus%1000;

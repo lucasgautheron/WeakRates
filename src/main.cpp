@@ -35,8 +35,12 @@ int main(int argc, const char *argv[])
     int error;
     read_EOS_table("data/elec_capt_rate_ls220.h5", table, &error);
 
+    // Perform calculations
+
     printf("%e %e %e %e\n", table.ln_rho_eos[0], table.ln_rho_eos[1], table.ln_t_eos[0], table.ln_t_eos[1]);
 
+    // poor man's multithreading
+    #pragma omp parallel for
     for(int i = 0; i < table.size(); ++i)
     {
         const double nb = exp(table.ln_rho_eos[i]), T = exp(table.ln_t_eos[i]), Y_e = table.y_e_eos[i], mu_nu = table.mu_nu_eos[i], ec_tab = table.elec_rate_tab_eos[i];

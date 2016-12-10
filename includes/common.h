@@ -8,6 +8,8 @@
 #include <algorithm>
 #include <math.h>
 
+#include <omp.h>
+
 #include <gsl/gsl_sf_fermi_dirac.h>
 #include <gsl/gsl_sf_gamma.h>
 #include <gsl/gsl_sf_result.h>
