@@ -1,9 +1,20 @@
 #include "common.h"
 
-// fast electron capture simulation, using the parametrization by Langake
+// Fast electron capture simulation, using the parametrization by Langake, Martinez-Pinedo et al.
 double electron_capture_fit(int A, int Z, double T, double mu_e, double Q)
 {
-    const double K = 6146, beta = 4.6, dE = 2.5;
+    // K [s]
+    // Characteristic time associated with the capture rate.
+    const double K = 6146;
+    
+    // Q [1]
+    // Typical GT+F matrix element
+    const double beta = 4.6;
+
+    // dE [MeV]
+    // Adjusted param accounting for the difference between the energy levels of the daughter & parent nuclei excited states.
+    const double dE = 2.5;
+
     if(Q>1e6) Q = beta_decay_Q(A, Z);
     if(Q<-1e6) return 0;
     const double chi = (Q-dE)/T;
