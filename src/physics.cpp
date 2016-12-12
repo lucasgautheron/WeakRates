@@ -14,7 +14,6 @@ double electron_capture_fit(int A, int Z, double T, double mu_e, double Q)
     // dE [MeV]
     // Adjusted param accounting for the difference between the energy levels of the daughter & parent nuclei excited states.
     const double dE = 2.5;
-
     if(Q>1e6) Q = beta_decay_Q(A, Z);
     if(Q<-1e6) return 0;
     const double chi = (Q-dE)/T;

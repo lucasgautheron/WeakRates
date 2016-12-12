@@ -145,7 +145,7 @@ double element_abundance(int A, int Z, double params[3], double *vlow, double *v
         dv[k] = 0;
         x[k] = table.parameters[k][keys[k]];
 
-        if(!table.abundances.count(next[k])) continue;
+        if(!table.abundances.count(next[k]) || !table.abundances[next[k]]) continue;
 
         abundance_data ab_next = *table.abundances[next[k]];
         for(int i = 0; i < ab_next.elements.size(); ++i) if(ab_next.elements[i].A == A && ab_next.elements[i].Z == Z) { dv[k] = ab_next.elements[i].abundance - v; break; }
