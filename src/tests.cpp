@@ -160,6 +160,7 @@ int main(int argc, const char *argv[])
 	    {
                 int A = elements[j].A, Z = elements[j].Z;
 	        double abundance = elements[j].abundance;
+
                 if(A < 20) continue;
                 total_abundance += abundance;
                 rate += abundance * electron_capture_fit(A, Z, ts->T, mu_e);
@@ -170,6 +171,7 @@ int main(int argc, const char *argv[])
         fclose(fp);
     }
 
+    return 0;
 
     for(int m = 0; m < table.m_ln_rho; ++m)
     for(int n = 0; n < table.n_ln_t; ++n)

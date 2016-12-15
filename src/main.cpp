@@ -49,28 +49,27 @@ int main(int argc, const char *argv[])
         table.scattering_xs_eos[i] = 0;
         std::vector<element> elements;
         get_abundances(conditions, elements);
-        table.scattering_xs_eos[i] = 0;
+        table.elec_rate_tab_eos[i] = table.scattering_xs_eos[i] = 0;
 
         for(int j = 0; j < elements.size(); ++j)
 	{
             int A = elements[j].A, Z = elements[j].Z;
 	    double abundance = elements[j].abundance;
-            if(A < 2 || Z < 2) continue;
-
-            //printf("%e %e (%e %e %e %e)\n", abundance, element_abundance(A, Z, conditions), elements[j].v[0], elements[j].v[1], elements[j].v[2], elements[j].v[3]);
-
             total_abundance += abundance;
+            if(A < 2 || Z < 2) continue;
+            
 	    if(abundance > 1e-30)
             {
-                rate += abundance * electron_capture_fit(A, Z, T, mu_e);
+                printf("%e (%e %e %e %e)\n", abundance, elements[j].v[0], elements[j].v[1], elements[j].v[2], elements[j].v[3]);
+                table.elec_rate_tab_eos[i] += abundance * electron_capture_fit(A, Z, T, mu_e);
                 table.scattering_xs_eos[i] += abundance * nucleus_scattering_cross_section(A, Z, eps_mu, abundance*nb);
             }
 	}
-        table.elec_rate_tab_eos[i] = rate;
 
-        if(total_abundance > 1e-15) printf("%d %d %e %e %e %e %e %e %e %e\n", i, elements.size(), T, nb, Y_e, mu_nu, ec_tab, rate, table.scattering_xs_eos[i]*1e36, total_abundance);
+        if(elements.size()) //printf("total=%f %d\n", total_abundance, elements.size());
+        if(total_abundance > 1e-15 && nb > 1e-4 && nb < 1e-2) printf("%d %d %e %e %e %e %e %e %e %e\n", i, elements.size(), T, nb, Y_e, mu_nu, ec_tab, table.elec_rate_tab_eos[i], table.scattering_xs_eos[i]*1e36, total_abundance);
         ++processed;
-        if(processed % 1000 == 0) std::cout << "Processed " << processed << " states out of " << table.size() << std::endl;
+        //if(processed % 1000 == 0) std::cout << "Processed " << processed << " states out of " << table.size() << std::endl;
         
     }
 

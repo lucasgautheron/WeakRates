@@ -85,7 +85,6 @@ int read_abundance_data(const char *path_abundances, const char *path_temperatur
 
             nucleus_to_AZ(e.nucleus, e.A, e.Z);
             ab->elements.push_back(e);
-            //printf("%d %d %f %e %e %e\n", e.A, e.Z, ab->param[0], bruenn_electron_capture_rate(e.A, e.Z, ab->param[0]), bruenn_electron_capture_rate(e.A, e.Z, ab->param[0], 100), bruenn_electron_capture_rate(e.A, e.Z, ab->param[0], 10000));
         }
 
         element neutron, proton;
@@ -118,7 +117,7 @@ void get_abundances(double params[3], std::vector<element> &elements)
     int keys[4];
     for(int k = 1; k < 4; ++k) keys[k] = get_lower_key(table.parameters[k-1], params[k-1]);
 
-    std::array<int, 3> cells[4] = { {keys[0], keys[1], keys[2]}, { keys[0]+1, keys[1], keys[2] }, { keys[0], keys[1]+1, keys[2] }, { keys[0], keys[1], keys[2]+1 } };
+    std::array<int, 3> cells[4] = { {keys[1], keys[2], keys[3]}, { keys[1]+1, keys[2], keys[3] }, { keys[1], keys[2]+1, keys[3] }, { keys[1], keys[2], keys[3]+1 } };
     double dx[4], x[4];
 
     for(int k = 1; k < 4; ++k)
@@ -131,13 +130,24 @@ void get_abundances(double params[3], std::vector<element> &elements)
     {
         if(!table.abundances.count(cells[k]) || !table.abundances[cells[k]])  continue;
         abundance_data ab = *table.abundances[cells[k]];
+
         for(int i = 0; i < ab.elements.size(); ++i)
         {
-            element e;
-            e.A = ab.elements[i].A;
-            e.Z = ab.elements[i].Z;
-            e.v[k] = ab.elements[i].abundance;
-            elements.push_back(e);
+            bool found = false;
+            for(int j = 0; j < elements.size(); ++j) if(elements[j].A == ab.elements[i].A && elements[j].Z == ab.elements[i].Z)
+            {
+                found = true;
+                elements[j].v[k] = ab.elements[i].abundance;
+                break;
+            }
+            if(!found)
+            {
+                element e;
+                e.A = ab.elements[i].A;
+                e.Z = ab.elements[i].Z;
+                e.v[k] = ab.elements[i].abundance;
+                elements.push_back(e);
+            }
         }
     }
 
