@@ -59,3 +59,99 @@ void read_EOS_table(const char *path, EOS_table &table, int *error)
   // close file
   status = H5Fclose (file);
 }
+
+void write_EOS_table(const char *path, EOS_table &table, int *error)
+{
+  hid_t file;
+  herr_t status;
+  hid_t dataset, dataspace;
+
+  // open file
+
+  file = H5Fcreate(path, H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
+
+
+  // write data sets
+
+  hsize_t one = 1;
+  dataspace = H5Screate_simple(1, &one, NULL);
+  dataset = H5Dcreate2(file, "pointsrho", H5T_NATIVE_INT, dataspace, 
+                          H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+  H5Dwrite(dataset, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, &table.m_ln_rho);
+  H5Dclose (dataset);
+  H5Sclose(dataspace);
+
+  dataspace = H5Screate_simple(1, &one, NULL);
+  dataset = H5Dcreate2(file, "pointst", H5T_NATIVE_INT, dataspace, 
+                          H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+  H5Dwrite(dataset, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, &table.n_ln_t);
+  H5Dclose (dataset);
+  H5Sclose(dataspace);
+
+
+  dataspace = H5Screate_simple(1, &one, NULL);
+  dataset = H5Dcreate2(file, "pointsye", H5T_NATIVE_INT, dataspace, 
+                          H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+  H5Dwrite(dataset, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, &table.o_y_e);
+  H5Dclose (dataset);
+  H5Sclose(dataspace);
+
+  dataspace = H5Screate_simple(1, &one, NULL);
+  dataset = H5Dcreate2(file, "pointsmu", H5T_NATIVE_INT, dataspace, 
+                          H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+  H5Dwrite(dataset, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, &table.p_mu);
+  H5Dclose (dataset);
+  H5Sclose(dataspace);
+
+
+  hsize_t sz[1] = { table.m_ln_rho };
+  dataspace = H5Screate_simple(1, sz, NULL);
+  dataset = H5Dcreate2(file, "logrho", H5T_NATIVE_DOUBLE, dataspace, 
+                          H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+  H5Dwrite(dataset, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, table.ln_rho_eos);
+  H5Dclose (dataset);
+  H5Sclose(dataspace);
+
+
+  sz[0] = table.n_ln_t;
+  dataspace = H5Screate_simple(1, sz, NULL);
+  dataset = H5Dcreate2(file, "logt", H5T_NATIVE_DOUBLE, dataspace, 
+                          H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+  H5Dwrite(dataset, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, table.ln_t_eos);
+  H5Dclose (dataset);
+  H5Sclose(dataspace);
+
+  sz[0] = table.o_y_e;
+  dataspace = H5Screate_simple(1, sz, NULL);
+  dataset = H5Dcreate2(file, "ye", H5T_NATIVE_DOUBLE, dataspace, 
+                          H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+  H5Dwrite(dataset, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, table.y_e_eos);
+  H5Dclose (dataset);
+  H5Sclose(dataspace);
+
+  sz[0] = table.p_mu;
+  dataspace = H5Screate_simple(1, sz, NULL);
+  dataset = H5Dcreate2(file, "mu_nu", H5T_NATIVE_DOUBLE, dataspace, 
+                          H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+  H5Dwrite(dataset, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, table.mu_nu_eos);
+  H5Dclose (dataset);
+  H5Sclose(dataspace);
+
+  hsize_t dims[4] = { table.m_ln_rho, table.n_ln_t, table.o_y_e, table.p_mu };
+
+  dataspace = H5Screate_simple(4, dims, NULL);
+  dataset = H5Dcreate2(file, "elec_capt_rate", H5T_NATIVE_DOUBLE, dataspace, 
+                          H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+  H5Dwrite(dataset, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, table.elec_rate_tab_eos);
+  H5Dclose (dataset);
+
+
+  dataset = H5Dcreate2(file, "scattering_xs_eos", H5T_NATIVE_DOUBLE, dataspace, 
+                          H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+  H5Dwrite(dataset, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, table.scattering_xs_eos);
+  H5Dclose (dataset);
+  H5Sclose(dataspace);
+
+  // close file
+  status = H5Fclose (file);
+}

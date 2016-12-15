@@ -23,3 +23,4 @@ struct EOS_table
 };
 
 void read_EOS_table(const char *path, EOS_table &table, int *error);
+void write_EOS_table(const char *path, EOS_table &table, int *error);

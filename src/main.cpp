@@ -20,6 +20,7 @@ int main(int argc, const char *argv[])
     EOS_table table;
     int error;
     read_EOS_table("data/elec_capt_rate_ls220.h5", table, &error);
+
     entries = table.size();
     std::cout << "Read " << entries << " EOS entries\n";
     table.dump();
@@ -61,6 +62,8 @@ int main(int argc, const char *argv[])
 
         printf("%d %e %e %e %e %e %e %e %e\n", i, T, nb, Y_e, mu_nu, ec_tab, rate, table.scattering_xs_eos[i]*1e36, total_abundance);
     }
+
+    write_EOS_table("output/table.h5", table, &error);
 
     return 0;
 }
