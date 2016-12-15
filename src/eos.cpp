@@ -139,7 +139,8 @@ void write_EOS_table(const char *path, EOS_table &table, int *error)
 
   hsize_t dims[4] = { table.m_ln_rho, table.n_ln_t, table.o_y_e, table.p_mu };
 
-  dataspace = H5Screate_simple(4, dims, NULL);
+  sz[0] = table.size();
+  dataspace = H5Screate_simple(1, sz, NULL);
   dataset = H5Dcreate2(file, "elec_capt_rate", H5T_NATIVE_DOUBLE, dataspace, 
                           H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
   H5Dwrite(dataset, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, table.elec_rate_tab_eos);

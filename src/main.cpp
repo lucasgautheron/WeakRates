@@ -20,6 +20,7 @@ int main(int argc, const char *argv[])
     EOS_table table;
     int error;
     read_EOS_table("data/elec_capt_rate_ls220.h5", table, &error);
+    write_EOS_table("output/table.h5", table, &error);
 
     entries = table.size();
     std::cout << "Read " << entries << " EOS entries\n";
@@ -27,12 +28,11 @@ int main(int argc, const char *argv[])
 
     // Perform calculations
 
-    printf("%e %e %e %e\n", table.ln_rho_eos[0], table.ln_rho_eos[1], table.ln_t_eos[0], table.ln_t_eos[1]);
-
+    int processed = 0;
     // poor man's multithreading
     #pragma omp parallel for
-    for(int m = 200; m < table.m_ln_rho; ++m)
-    for(int n = 40; n < table.n_ln_t; ++n)
+    for(int m = 0; m < table.m_ln_rho; ++m)
+    for(int n = 0; n < table.n_ln_t; ++n)
     for(int o = 0; o < table.o_y_e; ++o)
     for(int p = 0; p < table.p_mu; ++p)
     {
@@ -47,11 +47,18 @@ int main(int argc, const char *argv[])
         double rate = 0;
         double total_abundance = 0;
         table.scattering_xs_eos[i] = 0;
+        std::vector<element> elements;
+        get_abundances(conditions, elements);
+        table.scattering_xs_eos[i] = 0;
 
-	for(int A = 2; A < 295; ++A) for(int Z = 0; Z <= A; ++Z)
+        for(int j = 0; j < elements.size(); ++j)
 	{
-	    double vl = 0, vh = 0;
-	    double abundance = element_abundance(A, Z, conditions);
+            int A = elements[j].A, Z = elements[j].Z;
+	    double abundance = elements[j].abundance;
+            if(A < 2 || Z < 2) continue;
+
+            //printf("%e %e (%e %e %e %e)\n", abundance, element_abundance(A, Z, conditions), elements[j].v[0], elements[j].v[1], elements[j].v[2], elements[j].v[3]);
+
             total_abundance += abundance;
 	    if(abundance > 1e-30)
             {
@@ -59,8 +66,12 @@ int main(int argc, const char *argv[])
                 table.scattering_xs_eos[i] += abundance * nucleus_scattering_cross_section(A, Z, eps_mu, abundance*nb);
             }
 	}
+        table.elec_rate_tab_eos[i] = rate;
 
-        printf("%d %e %e %e %e %e %e %e %e\n", i, T, nb, Y_e, mu_nu, ec_tab, rate, table.scattering_xs_eos[i]*1e36, total_abundance);
+        if(total_abundance > 1e-15) printf("%d %d %e %e %e %e %e %e %e %e\n", i, elements.size(), T, nb, Y_e, mu_nu, ec_tab, rate, table.scattering_xs_eos[i]*1e36, total_abundance);
+        ++processed;
+        if(processed % 1000 == 0) std::cout << "Processed " << processed << " states out of " << table.size() << std::endl;
+        
     }
 
     write_EOS_table("output/table.h5", table, &error);

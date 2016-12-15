@@ -153,27 +153,26 @@ int main(int argc, const char *argv[])
             double mu_e = electron_potential(ts->nb, ts->Y);
             double total_abundance = 0, abundance_error = 0;
             double conditions[3] = {ts->T, ts->nb, ts->Y};
+            std::vector<element> elements;
+            get_abundances(conditions, elements);
 
-            for(int A = 2; A < 250; ++A) for(int Z = 0; Z <= A; ++Z) if(A >= 20)
-            {
-                //if(abs(A-Z) > 50) continue;
-                double vl = 0, vh = 0;
-                double abundance = element_abundance(A, Z, conditions, &vl, &vh);
+            for(int j = 0; j < elements.size(); ++j)
+	    {
+                int A = elements[j].A, Z = elements[j].Z;
+	        double abundance = elements[j].abundance;
+                if(A < 20) continue;
                 total_abundance += abundance;
-                abundance_error += (vh-vl)*(vh-vl);
                 rate += abundance * electron_capture_fit(A, Z, ts->T, mu_e);
                 rate_corr += abundance * electron_capture_fit(A, Z, ts->T, ts->mu_e);
             }
-            fprintf(fp, "%e %e %e %e %e %e %e %e %e\n", ts->T, ts->nb, ts->Y, ts->lambda, rate, rate/total_abundance, rate * sqrt(abundance_error)/total_abundance / total_abundance);
+            fprintf(fp, "%e %e %e %e %e %e\n", ts->T, ts->nb, ts->Y, ts->lambda, rate, rate/total_abundance);
         }
         fclose(fp);
     }
 
 
-    // poor man's multithreading
-    #pragma omp parallel for
-    for(int m = 200; m < table.m_ln_rho; ++m)
-    for(int n = 40; n < table.n_ln_t; ++n)
+    for(int m = 0; m < table.m_ln_rho; ++m)
+    for(int n = 0; n < table.n_ln_t; ++n)
     for(int o = 0; o < table.o_y_e; ++o)
     for(int p = 0; p < table.p_mu; ++p)
     {
@@ -188,20 +187,26 @@ int main(int argc, const char *argv[])
         double rate = 0;
         double total_abundance = 0;
         table.scattering_xs_eos[i] = 0;
+        std::vector<element> elements;
+        get_abundances(conditions, elements);
+        table.scattering_xs_eos[i] = 0;
 
-    for(int A = 2; A < 295; ++A) for(int Z = 0; Z <= A; ++Z)
-    {
-        double vl = 0, vh = 0;
-        double abundance = element_abundance(A, Z, conditions);
+        for(int j = 0; j < elements.size(); ++j)
+	{
+            int A = elements[j].A, Z = elements[j].Z;
+	    double abundance = elements[j].abundance;
+            if(A < 2 || Z < 2) continue;
+
+            //printf("%e %e (%e %e %e %e)\n", abundance, element_abundance(A, Z, conditions), elements[j].v[0], elements[j].v[1], elements[j].v[2], elements[j].v[3]);
+
             total_abundance += abundance;
-        if(abundance > 1e-30)
+	    if(abundance > 1e-30)
             {
                 rate += abundance * electron_capture_fit(A, Z, T, mu_e);
                 table.scattering_xs_eos[i] += abundance * nucleus_scattering_cross_section(A, Z, eps_mu, abundance*nb);
             }
-    }
-
-        printf("%d %e %e %e %e %e %e %e %e\n", i, T, nb, Y_e, mu_nu, ec_tab, rate, table.scattering_xs_eos[i]*1e36, total_abundance);
+	}
+        table.elec_rate_tab_eos[i] = rate;
     }
 
     return 0;

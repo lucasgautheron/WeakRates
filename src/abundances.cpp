@@ -1,14 +1,5 @@
 #include "common.h"
 
-struct element
-{
-    int nucleus;
-    int A,Z;
-    double abundance;
-
-    element() : nucleus(0), A(0), Z(0) { }
-};
-
 struct abundance_data
 {
     int idx[3];
@@ -122,58 +113,41 @@ int get_lower_key(std::vector<double> &arr, double value)
 }
 
 // (table, A, Z, {T [MeV], nb [fm^{-3}], Ye})
-double element_abundance(int A, int Z, double params[3], double *vlow, double *vhigh)
+void get_abundances(double params[3], std::vector<element> &elements)
 {
-    int keys[3];
-    for(int k = 0; k < 3; ++k) keys[k] = get_lower_key(table.parameters[k], params[k]);
- 
-    std::array<int, 3> lower = { keys[0], keys[1], keys[2] }, upper = { keys[0]+1, keys[1]+1, keys[2]+1 };
-    std::array<int, 3> next[3] = { { keys[0]+1, keys[1], keys[2] }, { keys[0], keys[1]+1, keys[2] }, { keys[0], keys[1], keys[2]+1 } };
-    double dv[3], dx[3], x[3];
+    int keys[4];
+    for(int k = 1; k < 4; ++k) keys[k] = get_lower_key(table.parameters[k-1], params[k-1]);
 
-    abundance_data *ptr = table.abundances[lower];
-    double v = 0;
-    if(ptr)
+    std::array<int, 3> cells[4] = { {keys[0], keys[1], keys[2]}, { keys[0]+1, keys[1], keys[2] }, { keys[0], keys[1]+1, keys[2] }, { keys[0], keys[1], keys[2]+1 } };
+    double dx[4], x[4];
+
+    for(int k = 1; k < 4; ++k)
     {
-        abundance_data ab = *ptr;
-        for(int i = 0; i < ab.elements.size(); ++i) if(ab.elements[i].A == A && ab.elements[i].Z == Z) { v = ab.elements[i].abundance; break; }
+        dx[k] = keys[k]+1 < table.parameters[k-1].size() ? table.parameters[k-1][keys[k]+1]-table.parameters[k-1][keys[k]] : 1;
+        x[k] = table.parameters[k-1][keys[k]];
     }
 
-    for(int k = 0; k < 3; ++k)
+    for(int k = 0; k < 4; ++k)
     {
-        dx[k] = keys[k]+1 < table.parameters[k].size() ? table.parameters[k][keys[k]+1]-table.parameters[k][keys[k]] : 1;
-        dv[k] = 0;
-        x[k] = table.parameters[k][keys[k]];
-
-        if(!table.abundances.count(next[k]) || !table.abundances[next[k]]) continue;
-
-        abundance_data ab_next = *table.abundances[next[k]];
-        for(int i = 0; i < ab_next.elements.size(); ++i) if(ab_next.elements[i].A == A && ab_next.elements[i].Z == Z) { dv[k] = ab_next.elements[i].abundance - v; break; }
-    }
-
-    double v_next = 0;
-    {
-        abundance_data *ptr = table.abundances.count(upper) ? table.abundances[upper] : NULL;
-        if(!ptr) v_next = v;
-        else
+        if(!table.abundances.count(cells[k]) || !table.abundances[cells[k]])  continue;
+        abundance_data ab = *table.abundances[cells[k]];
+        for(int i = 0; i < ab.elements.size(); ++i)
         {
-            abundance_data ab = *ptr;
-            for(int i = 0; i < ab.elements.size(); ++i) if(ab.elements[i].A == A && ab.elements[i].Z == Z) { v_next = ab.elements[i].abundance; break; }
+            element e;
+            e.A = ab.elements[i].A;
+            e.Z = ab.elements[i].Z;
+            e.v[k] = ab.elements[i].abundance;
+            elements.push_back(e);
         }
     }
 
-    double vals[] = { v+dv[0], v+dv[1], v+dv[2], v_next };
-
-    if(vlow)
+    for(int i = 0; i < elements.size(); ++i)
     {
-        *vlow = *std::min_element(std::begin(vals), std::end(vals));
+        elements[i].abundance = elements[i].v[0];
+        for(int k = 1; k < 4; ++k)
+        {
+            elements[i].abundance += (params[k-1]-x[k]) * (elements[i].v[k]-elements[i].v[0]) / dx[k];
+        }
     }
-    if(vhigh)
-    {
-        *vhigh = *std::max_element(std::begin(vals), std::end(vals));
-    }
-
-    for(int k = 0; k < 3; ++k) v += (params[k]-x[k]) * dv[k] / dx[k];
-
-    return v;
 }
+
