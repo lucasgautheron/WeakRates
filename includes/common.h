@@ -6,6 +6,7 @@
 #include <vector>
 #include <array>
 #include <algorithm>
+#include <iterator>
 #include <math.h>
 
 #include <omp.h>
@@ -17,6 +18,7 @@
 #define H5_USE_16_API
 #include "hdf5.h"
 
+#include "eos.h"
 #include "constants.h"
 #include "nuclear.h"
 #include "physics.h"

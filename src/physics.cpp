@@ -31,6 +31,7 @@ double electron_capture_fit(int A, int Z, double T, double mu_e, double Q)
 double nucleus_scattering_cross_section(int A, int Z, double eps_neutrino, double density)
 {
     const double c_a = 0.5, c_v = 0.5 + 2.0 * 0.23119;
+    density *= 1e39; // fm^{-3} -> cm^{-3}
 
     double y_bruenn = 2.0 / 5.0 * pow(1.07 * A, 2./3.) * pow(eps_neutrino, 2.) / (HBARC_CM * 1.0e13);
 
