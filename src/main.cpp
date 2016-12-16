@@ -59,20 +59,9 @@ int main(int argc, const char *argv[])
 
             total_abundance += abundance;
             
-	    if(abundance > 1e-30)
-            {
-                //printf("%e (%e %e %e %e)\n", abundance, elements[j].v[0], elements[j].v[1], elements[j].v[2], elements[j].v[3]);
-                table.elec_rate_tab_eos[i] += abundance * electron_capture_fit(A, Z, T, mu_e);
-                table.scattering_xs_eos[i] += abundance * nucleus_scattering_cross_section(A, Z, eps_mu, abundance*nb);
-            }
+            table.elec_rate_tab_eos[i] += abundance * electron_capture_fit(A, Z, T, mu_e);
+            table.scattering_xs_eos[i] += abundance * nucleus_scattering_cross_section(A, Z, eps_mu, abundance*nb);
 	}
-
-         //printf("%d %e %e %e %e %e %e\n", i, T, nb, Y_e, mu_nu, table.scattering_xs_eos[i], table.scattering_xs_eos[i]/total_abundance);
-
-        //if(total_abundance > 1e-15 && nb > 1e-4 && nb < 1e-2) printf("%d %d %e %e %e %e %e %e %e %e\n", i, elements.size(), T, nb, Y_e, mu_nu, ec_tab, table.elec_rate_tab_eos[i], table.scattering_xs_eos[i]*1e36, total_abundance);
-        ++processed;
-        //if(processed % 10000 == 0) std::cout << "Processed " << processed << " states out of " << table.size() << std::endl;
-        
     }
 
     write_EOS_table("output/sigma_scattering_rate.h5", table, &error);
