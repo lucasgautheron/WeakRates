@@ -147,7 +147,7 @@ void write_EOS_table(const char *path, EOS_table &table, int *error)
   H5Dclose (dataset);
 
 
-  dataset = H5Dcreate2(file, "scattering_xs_eos", H5T_NATIVE_DOUBLE, dataspace, 
+  dataset = H5Dcreate2(file, "sigma_scattering_nuclei", H5T_NATIVE_DOUBLE, dataspace, 
                           H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
   H5Dwrite(dataset, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, table.scattering_xs_eos);
   H5Dclose (dataset);
