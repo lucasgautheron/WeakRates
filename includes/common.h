@@ -23,3 +23,6 @@
 #include "nuclear.h"
 #include "physics.h"
 #include "abundances.h"
+
+#define max(x, y) ((x)>(y)?(x):(y))
+#define min(x, y) ((x)<(y)?(x):(y))

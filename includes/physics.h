@@ -10,8 +10,16 @@ inline double average_neutrino_energy(double T, double mu_nu)
     return T*(6*gsl_sf_fermi_dirac_int (3,mu_nu/T)) / (2*gsl_sf_fermi_dirac_int (2,mu_nu/T));
 }
 
+inline double fermi_dirac(double E, double mu, double T)
+{
+    return 1./(exp((E-mu)/T)+1);
+}
+
 // fast electron capture simulation, using the parametrization by Langake
 double electron_capture_fit(int A, int Z, double T, double mu_e = M_ELECTRON, double Q = 1e10);
+
+// Bruenn 1985
+double electron_capture_proton(double T, double mu_e, double mu_nu, double n_p, double n_n);
 
 // Bruenn 1985 + Horowitz 1997
 double nucleus_scattering_cross_section(int A, int Z, double eps_neutrino, double density);

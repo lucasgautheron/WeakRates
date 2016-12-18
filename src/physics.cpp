@@ -27,6 +27,31 @@ double electron_capture_fit(int A, int Z, double T, double mu_e, double Q)
     return rate;
 }
 
+// Bruenn 1985
+double electron_capture_proton(double T, double mu_e, double mu_nu, double n_p, double n_n)
+{
+    const double Vud = 0.97427;
+    const double gA = 1.24, gV = 1.;
+    const double Q = M_NEUTRON-M_PROTON;
+    const double eta_np = /*(n_p-n_n)/(exp((mu_nu-mu_e+Q)/T)-1)*/n_n;
+
+    double rate = 4*CELERITY_FM * (gV*gV+3*gA*gA) * Vud*Vud * pow(2*M_PI, -3.) * FERMI_COUPLING*FERMI_COUPLING;
+    rate *= eta_np;
+    
+    double integral = 0;
+    const int N = 1000;
+    double Emin = max(0, M_ELECTRON-Q), Emax = 30*T;
+    const double dE = (Emax-Emin)/double(N);
+    for(int i = 0; i < N; ++i)
+    {
+        const double E = Emin + (Emax-Emin)*(double(i)+0.5)/double(N);
+        integral += E * E * (1-fermi_dirac(E, mu_nu, T)) * fermi_dirac(E+Q, mu_e, T) * (E+Q)*(E+Q) * sqrt(1-(M_ELECTRON/(E+Q))*(M_ELECTRON/(E+Q))) * dE;
+    }
+    rate *= integral;
+
+    return rate;
+}
+
 // Bruenn 1985 + Horowitz 1997
 double nucleus_scattering_cross_section(int A, int Z, double eps_neutrino, double density)
 {

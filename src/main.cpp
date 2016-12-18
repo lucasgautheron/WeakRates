@@ -13,7 +13,7 @@ int main(int argc, const char *argv[])
     std::cout << "Read " << entries << " nuclear data entries\n";
 
     // Read abundance data
-    entries = read_abundance_data("data/EOS.compo", "data/EOS.t", "data/EOS.nb", "data/EOS.yq");
+    entries = read_abundance_data("data/abundances/2/eos.compo", "data/abundances/2/eos.t", "data/abundances/2/eos.nb", "data/abundances/2/eos.yq");
     std::cout << "Read " << entries << " nuclear abundance data entries\n";
 
     // Read EOS data
@@ -50,10 +50,17 @@ int main(int argc, const char *argv[])
         std::vector<element> elements;
         get_abundances(conditions, elements);
 
+        double n_n = 0, n_p = 0;
+
         for(int j = 0; j < elements.size(); ++j)
 	{
             int A = elements[j].A, Z = elements[j].Z;
 	    double abundance = elements[j].abundance;
+            if(A==1)
+            {
+                if(Z==0) n_n = abundance;
+                else n_p = abundance;
+            }
             
             if(A < 2 || Z < 2) continue;
 
@@ -62,6 +69,8 @@ int main(int argc, const char *argv[])
             table.elec_rate_tab_eos[i] += abundance * electron_capture_fit(A, Z, T, mu_e);
             table.scattering_xs_eos[i] += abundance * nucleus_scattering_cross_section(A, Z, eps_mu, abundance*nb);
 	}
+        
+        table.elec_rate_tab_eos[i] += electron_capture_proton(T, mu_e, mu_nu, n_p, n_n);
     }
 
     write_EOS_table("output/sigma_scattering_rate.h5", table, &error);
