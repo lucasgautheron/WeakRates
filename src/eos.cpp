@@ -1,6 +1,6 @@
 #include "common.h"
 
-void read_EOS_table(const char *path, EOS_table &table, int *error)
+void read_short_EOS_table(const char *path, short_EOS_table &table, int *error)
 {
   hid_t file;
   herr_t status;
@@ -28,13 +28,7 @@ void read_EOS_table(const char *path, EOS_table &table, int *error)
   status = H5Dread (dataset, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, &table.p_mu);
   H5Dclose (dataset);
 
-  int size = table.size();
-  table.ln_rho_eos = new double[table.m_ln_rho];
-  table.ln_t_eos = new double[table.n_ln_t];
-  table.y_e_eos = new double[table.o_y_e];
-  table.mu_nu_eos = new double[table.p_mu];
-  table.elec_rate_tab_eos = new double[size+1];
-  table.scattering_xs_eos = new double[size+1];
+  table.allocate();
 
   dataset = H5Dopen (file, "logrho");
   status = H5Dread (dataset, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, table.ln_rho_eos);
@@ -60,7 +54,111 @@ void read_EOS_table(const char *path, EOS_table &table, int *error)
   status = H5Fclose (file);
 }
 
-void write_EOS_table(const char *path, EOS_table &table, int *error)
+void read_full_EOS_table(const char *path, full_EOS_table &table, int *error)
+{
+  hid_t file;
+  herr_t status;
+  hid_t dataset;
+
+  // open file
+
+  file = H5Fopen (path, H5F_ACC_RDONLY, H5P_DEFAULT);
+
+  // read data sets
+  dataset = H5Dopen (file, "pointsrho");
+  status = H5Dread (dataset, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, &table.m_ln_rho);
+  H5Dclose (dataset);  
+  
+  dataset = H5Dopen (file, "pointst");
+  status = H5Dread (dataset, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, &table.n_ln_t);
+  H5Dclose (dataset);  
+
+  dataset = H5Dopen (file, "pointsye");
+  status = H5Dread (dataset, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, &table.o_y_e);
+  H5Dclose (dataset);
+ 
+  table.allocate();
+
+  dataset = H5Dopen (file, "logrho");
+status = H5Dread (dataset, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, table.ln_rho_eos);
+H5Dclose (dataset);
+
+dataset = H5Dopen (file, "logt");
+status = H5Dread (dataset, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, table.ln_t_eos);
+H5Dclose (dataset);
+
+dataset = H5Dopen (file, "ye");
+status = H5Dread (dataset, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, table.y_e_eos);
+H5Dclose (dataset);
+
+dataset = H5Dopen (file, "pressure");
+status = H5Dread (dataset, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, table.p_eos);
+H5Dclose (dataset);
+
+dataset = H5Dopen (file, "energy");
+status = H5Dread (dataset, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, table.e_eos);
+H5Dclose (dataset);
+
+dataset = H5Dopen (file, "entropy");
+status = H5Dread (dataset, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, table.entropy_eos);
+H5Dclose (dataset);
+
+dataset = H5Dopen (file, "mub");
+status = H5Dread (dataset, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, table.mub_eos);
+H5Dclose (dataset);
+
+dataset = H5Dopen (file, "muq");
+status = H5Dread (dataset, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, table.muq_eos);
+H5Dclose (dataset);
+
+dataset = H5Dopen (file, "mul");
+status = H5Dread (dataset, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, table.mul_eos);
+H5Dclose (dataset);
+
+dataset = H5Dopen (file, "dpdrhoe");
+status = H5Dread (dataset, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, table.dp_drho_eos);
+H5Dclose (dataset);
+
+dataset = H5Dopen (file, "dpderho");
+status = H5Dread (dataset, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, table.dp_deps_eos);
+H5Dclose (dataset);
+
+dataset = H5Dopen (file, "cs2");
+status = H5Dread (dataset, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, table.c_sound_squared_newtonian_eos);
+H5Dclose (dataset);
+
+dataset = H5Dopen (file, "xp");
+status = H5Dread (dataset, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, table.xp_eos);
+H5Dclose (dataset);
+
+dataset = H5Dopen (file, "xn");
+status = H5Dread (dataset, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, table.xn_eos);
+H5Dclose (dataset);
+
+dataset = H5Dopen (file, "xalpha");
+status = H5Dread (dataset, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, table.xa_eos);
+H5Dclose (dataset);
+
+dataset = H5Dopen (file, "xheavy");
+status = H5Dread (dataset, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, table.xheavy_eos);
+H5Dclose (dataset);
+
+dataset = H5Dopen (file, "aheavy");
+status = H5Dread (dataset, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, table.aheavy_eos);
+H5Dclose (dataset);
+
+dataset = H5Dopen (file, "zheavy");
+status = H5Dread (dataset, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, table.zheavy_eos);
+H5Dclose (dataset);
+
+dataset = H5Dopen (file, "eosflag");
+status = H5Dread (dataset, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, table.eflg_eos);
+
+  // close file
+  status = H5Fclose (file);
+}
+
+void write_short_EOS_table(const char *path, short_EOS_table &table, int *error)
 {
   hid_t file;
   herr_t status;
