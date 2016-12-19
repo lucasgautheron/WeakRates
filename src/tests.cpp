@@ -87,7 +87,7 @@ int main(int argc, const char *argv[])
     std::cout << "Read " << entries << " nuclear data entries\n";
 
     // Read abundance data
-    entries = read_abundance_data("data/EOS.compo", "data/EOS.t", "data/EOS.nb", "data/EOS.yq");
+    entries = read_abundance_data("data/abundances/1/eos.compo", "data/abundances/1/eos.t", "data/abundances/1/eos.nb", "data/abundances/1/eos.yq");
     std::cout << "Read " << entries << " nuclear abundance data entries\n";
 
     // Read EOS data
@@ -105,7 +105,7 @@ int main(int argc, const char *argv[])
     for(int i = 0; i < 1000; ++i)
     {
         double n = pow(10., -8+7.*double(i)/1000.);
-        fprintf(fp, "%e %e\n", n*1.674e-24*1e39, electron_potential(n, 1.));
+        fprintf(fp, "%e %e\n", n*1.674e-24*1e39, degenerate_potential(M_ELECTRON, n));
     }
     fclose(fp);
 
@@ -122,8 +122,9 @@ int main(int argc, const char *argv[])
         if(nc->T < 0.1) continue;
         if(nc->nb_Y < 1e-7) continue;
 
-        fprintf(fp, "%d %d %e %e %e %e %e\n", nc->A, nc->Z, nc->T, nc->nb_Y, nc->lambda,
-        electron_capture_fit(nc->A, nc->Z, nc->T, nc->mu_e), electron_capture_fit(nc->A, nc->Z, nc->T, electron_potential(nc->nb_Y, 1.)));
+        fprintf(fp, "%d %d %e %e %e %e %e %e %e %e\n", nc->A, nc->Z, nc->T, nc->nb_Y, nc->lambda,
+        electron_capture_fit(nc->A, nc->Z, nc->T, nc->mu_e), electron_capture_fit(nc->A, nc->Z, nc->T, degenerate_potential(M_ELECTRON, nc->nb_Y)),
+        gas_potential(nc->T, nc->nb_Y, M_ELECTRON), degenerate_potential(M_ELECTRON, nc->nb_Y), nc->mu_e);
     }
     fclose(fp);
 
@@ -133,7 +134,7 @@ int main(int argc, const char *argv[])
     for(int i = 0; i < 1000; ++i)
     {
         double _Q = Q[0]+(Q[1]-Q[0])*double(i)/1000.;
-        double mu_e[2] = { electron_potential(1.32e-6, 0.447), electron_potential(1.12e-4, 0.361) };
+        double mu_e[2] = { degenerate_potential(M_ELECTRON, 1.32e-6*0.447), degenerate_potential(M_ELECTRON, 1.12e-4*0.361) };
         fprintf(fp, "%f %e %e\n", _Q, electron_capture_fit(39, 21, 0.68, mu_e[0], _Q), electron_capture_fit(39, 21, 1.3, mu_e[1], _Q));
     }
     fclose(fp);
@@ -150,7 +151,7 @@ int main(int argc, const char *argv[])
         {
             thermo_state *ts = thermo_states[k][i];
             double rate = 0, rate_corr = 0;
-            double mu_e = electron_potential(ts->nb, ts->Y);
+            double mu_e = degenerate_potential(M_ELECTRON, ts->nb*ts->Y);
             double total_abundance = 0, abundance_error = 0;
             double conditions[3] = {ts->T, ts->nb, ts->Y};
             std::vector<element> elements;
@@ -183,7 +184,7 @@ int main(int argc, const char *argv[])
         //if(nb >= 0.1) continue;
         double conditions[3] = {T, nb, Y_e};
 
-        double mu_e = electron_potential(nb, Y_e), eps_mu = average_neutrino_energy(T, mu_nu);
+        double mu_e = degenerate_potential(M_ELECTRON, nb*Y_e), eps_mu = average_neutrino_energy(T, mu_nu);
 
 
         double rate = 0;

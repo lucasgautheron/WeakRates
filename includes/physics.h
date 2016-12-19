@@ -1,21 +1,21 @@
 
-inline double gas_density(double T, double mu, double mass, const int g = 2)
+inline double gas_density(double T, double x, double mass, const int g = 2) // x = mu/m
 {
-    const double prefactor = g * pow(mass * CELERITY_FM / HBAR,3.) / (2*M_PI*M_PI);
+    const double prefactor = g * pow(mass / HBAR / CELERITY_FM, 3.) / (2*M_PI*M_PI);
     
     double integral = 0;
-    const int N = 1000;
-    double umin = 1, umax = 30*T/mass;
+    const int N = 512;
+    double umin = 1, umax = 20*(T/mass+x);
     const double du = (umax-umin)/double(N);
     for(int i = 0; i < N; ++i)
     {
         const double u = umin + (umax-umin)*(double(i)+0.5)/double(N);
-        integral += u*sqrt(u*u-1) / (exp((u-mu/mass)*mass/T)-1) * du;
+        integral += u*sqrt(u*u-1) / (exp((u-x)*mass/T)+1) * du;
     }
     return prefactor * integral;
 }
 
-// recover mu_e from (nb, Ye), assuming degenerate electron gas
+// recover mu from density, assuming degenerate gas (T << Tf)
 inline double degenerate_potential(double mass, double density)
 {
     return mass*sqrt(1+pow(density*1.705199692e9, 2./3.));
@@ -23,23 +23,28 @@ inline double degenerate_potential(double mass, double density)
 
 inline double gas_potential(double T, double density, double mass, const int g = 2)
 {
-    const double max_error = 1e-3;
-    const int max_iterations = 1000;
-    const double x0 = degenerate_potential(mass, density); // first guess
+    const double max_error = 1e-5;
+    const int max_iterations = 256;
+    const double x0 = degenerate_potential(mass, density)/mass; // first guess
+
+    // if cold enough, use the degenerate expression. 
+    // (avoids infinities)
+    const double fermi_temperature = 0.5 * pow(HBARC_FM/mass, 2.) * pow(3*M_PI*M_PI*density, 2./3.);
+    if(T/fermi_temperature < 0.001) return x0*mass;
     
-    double x = x0, x1 = x0, error = max_error+1;
+    double x = 1.01, x1 = 1.01, error = max_error+1;
     
     int i = 0;
     while (error > max_error && i < max_iterations)
     {
         double cdensity = gas_density(T, x, mass, g);
-        double dd = (cdensity-gas_density(T, x-max_error*x/10, mass, g))/(x*max_error/10);
+        double dd = (gas_density(T, x+max_error/100, mass, g)-cdensity)/(max_error/100);
         x1 = x - (cdensity-density)/(dd);
         error = fabs(x1-x);
         x = x1;
         ++i;
     }
-    return x;
+    return x*mass;
 }
 
 inline double average_neutrino_energy(double T, double mu_nu)
