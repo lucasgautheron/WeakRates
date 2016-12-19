@@ -2,7 +2,7 @@
 OPTIMIZATION=-Ofast -funroll-loops
 
 CPPFLAGS=$(OPTIMIZATION) -Wall -std=c++0x -I./includes/ -I/usr/include/hdf5/serial/ -fopenmp
-LDFLAGS=-g -Wall -L/usr/lib/x86_64-linux-gnu/hdf5/serial
+LDFLAGS=-g -Wall -Wextra -L/usr/lib/x86_64-linux-gnu/hdf5/serial
 LDLIBS=-lm -lgsl -lgslcblas -lhdf5 -lpthread -fopenmp
 
 SRCS=src/main.cpp src/abundances.cpp src/physics.cpp src/nuclear.cpp src/eos.cpp

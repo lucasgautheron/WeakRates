@@ -13,7 +13,7 @@ int main(int argc, const char *argv[])
     std::cout << "Read " << entries << " nuclear data entries\n";
 
     // Read abundance data
-    entries = read_abundance_data("data/abundances/2/eos.compo", "data/abundances/2/eos.t", "data/abundances/2/eos.nb", "data/abundances/2/eos.yq");
+    entries = read_abundance_data("data/abundances/1/eos.compo", "data/abundances/1/eos.t", "data/abundances/1/eos.nb", "data/abundances/1/eos.yq");
     std::cout << "Read " << entries << " nuclear abundance data entries\n";
 
     // Read EOS data
@@ -42,7 +42,7 @@ int main(int argc, const char *argv[])
 
         double conditions[3] = {T, nb, Y_e};
 
-        double mu_e = electron_potential(nb, Y_e), eps_mu = average_neutrino_energy(T, mu_nu);
+        double mu_e = degenerate_potential(M_ELECTRON, nb*Y_e), eps_mu = average_neutrino_energy(T, mu_nu);
 
         table.elec_rate_tab_eos[i] = table.scattering_xs_eos[i] = 0;
 
@@ -70,7 +70,7 @@ int main(int argc, const char *argv[])
             table.scattering_xs_eos[i] += abundance * nucleus_scattering_cross_section(A, Z, eps_mu, abundance*nb);
 	}
         
-        table.elec_rate_tab_eos[i] += electron_capture_proton(T, mu_e, mu_nu, n_p, n_n);
+        table.elec_rate_tab_eos[i] += electron_capture_proton(T, nb, mu_e, mu_nu, n_p, n_n);
     }
 
     write_EOS_table("output/sigma_scattering_rate.h5", table, &error);

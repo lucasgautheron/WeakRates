@@ -28,12 +28,14 @@ double electron_capture_fit(int A, int Z, double T, double mu_e, double Q)
 }
 
 // Bruenn 1985
-double electron_capture_proton(double T, double mu_e, double mu_nu, double n_p, double n_n)
+double electron_capture_proton(double T, double nb, double mu_e, double mu_nu, double n_p, double n_n)
 {
     const double Vud = 0.97427;
     const double gA = 1.24, gV = 1.;
     const double Q = M_NEUTRON-M_PROTON;
-    const double eta_np = /*(n_p-n_n)/(exp((mu_nu-mu_e+Q)/T)-1)*/n_n;
+    const double mu_p = gas_potential(T, nb*n_p, M_PROTON), mu_n = gas_potential(T, nb*n_n, M_NEUTRON);
+
+    const double eta_np = (n_p-n_n)/(exp((mu_p-mu_n+Q)/T)-1);
 
     double rate = 4*CELERITY_FM * (gV*gV+3*gA*gA) * Vud*Vud * pow(2*M_PI, -3.) * FERMI_COUPLING*FERMI_COUPLING;
     rate *= eta_np;
