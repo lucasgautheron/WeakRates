@@ -49,7 +49,7 @@ inline double gas_potential(double T, double density, double mass, const int g =
 
 inline double average_neutrino_energy(double T, double mu_nu)
 {
-    return T*(6*gsl_sf_fermi_dirac_int (3,mu_nu/T)) / (2*gsl_sf_fermi_dirac_int (2,mu_nu/T));
+    return mu_nu/T > -40 ? T*(6*gsl_sf_fermi_dirac_int (3,mu_nu/T)) / (2*gsl_sf_fermi_dirac_int (2,mu_nu/T)) : 3*T;
 }
 
 inline double fermi_dirac(double E, double mu, double T)
@@ -64,7 +64,7 @@ double electron_capture_fit(int A, int Z, double T, double mu_e = M_ELECTRON, do
 double electron_capture_proton(double T, double nb, double mu_e, double mu_nu, double eta_pn);
 
 // Bruenn 1985 + Horowitz 1997
-double nucleus_scattering_cross_section(int A, int Z, double eps_neutrino, double density);
+double nucleus_scattering_cross_section(int A, int Z, double eta, double eps_neutrino, double density);
 
 // Bruno Peres
 double  elec_capt_proton_effective(double mu_e, double mu_nu, double t, double muneut, double mup, double y_p, double y_n, double eta_pn);

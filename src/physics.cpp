@@ -19,6 +19,8 @@ double electron_capture_fit(int A, int Z, double T, double mu_e, double Q)
     const double chi = (Q-dE)/T;
     const double eta = chi+mu_e/T;
 
+    if(eta < -40) return 0;
+
     double rate = 0.693 * beta/K * pow(T/M_ELECTRON, 5.);
     
     // gsl fermi integrals include a normalization factor 1/Gamma(j) hence the multiplication by (j-1)!
@@ -38,7 +40,7 @@ double electron_capture_proton(double T, double nb, double mu_e, double mu_nu, d
     rate *= eta_pn;
     
     double integral = 0;
-    const int N = 1000;
+    const int N = 256;
     double Emin = max(0, M_ELECTRON-Q), Emax = 30*T;
     const double dE = (Emax-Emin)/double(N);
     for(int i = 0; i < N; ++i)
@@ -52,7 +54,7 @@ double electron_capture_proton(double T, double nb, double mu_e, double mu_nu, d
 }
 
 // Bruenn 1985 + Horowitz 1997
-double nucleus_scattering_cross_section(int A, int Z, double eps_neutrino, double density)
+double nucleus_scattering_cross_section(int A, int Z, double eta, double eps_neutrino, double density)
 {
     const double c_a = 0.5, c_v = 0.5 + 2.0 * 0.23119;
     density *= 1e39; // fm^{-3} -> cm^{-3}
@@ -77,6 +79,9 @@ double nucleus_scattering_cross_section(int A, int Z, double eps_neutrino, doubl
       * pow(gamma_ion, 1.5))));
 
     sigma_scattering_nucleus *= s_ion;
+
+    sigma_scattering_nucleus *= eta > -40 ? 120 * gsl_sf_fermi_dirac_int (5,eta) / (6 * gsl_sf_fermi_dirac_int (3,eta)) : 20; // f5_over_f3
+
     return sigma_scattering_nucleus;
 }
 
