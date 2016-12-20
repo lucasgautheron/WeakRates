@@ -5,6 +5,9 @@ struct EOS_table
     virtual void dump() {}
     virtual const int size() { return 0; }
     virtual void allocate() {}
+
+    virtual void read(const char *path, int *error) {}
+    virtual void write(const char *path, int *error) {}
 };
 
 
@@ -13,6 +16,9 @@ struct short_EOS_table : EOS_table
     int p_mu;
     double *mu_nu_eos, *elec_rate_tab_eos, *elec_rate_single_eos;
     double *scattering_xs_eos, *elec_rate_fast_eos;
+
+    void read(const char *path, int *error);
+    void write(const char *path, int *error);
 
     void dump()
     {
@@ -55,6 +61,8 @@ struct full_EOS_table : EOS_table
     int *eflg_eos;
     double *mu_nu_effective_frac, *thermo_eos, *yi_eos;
 
+    void read(const char *path, int *error);
+
     const int size()
     {
         return m_ln_rho*n_ln_t*o_y_e;
@@ -93,9 +101,8 @@ struct full_EOS_table : EOS_table
         aheavy_eos = new double[s];
         zheavy_eos = new double[s];
         eflg_eos = new int[s];
+
+        thermo_eos = new double[s * 8];
+        yi_eos = new double[s * 3];
     }
 };
-
-void read_short_EOS_table(const char *path, short_EOS_table &table, int *error);
-void read_full_EOS_table(const char *path, full_EOS_table &table, int *error);
-void write_short_EOS_table(const char *path, short_EOS_table &table, int *error);

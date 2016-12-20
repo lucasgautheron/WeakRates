@@ -19,8 +19,8 @@ int main(int argc, const char *argv[])
     // Read rate EOS data
     short_EOS_table rates_table;
     int error;
-    read_short_EOS_table("data/elec_capt_rate_ls220.h5", rates_table, &error);
-    write_short_EOS_table("output/sigma_scattering_rate.h5", rates_table, &error);
+    rates_table.read("data/elec_capt_rate_ls220.h5", &error);
+    rates_table.write("output/sigma_scattering_rate.h5", &error);
 
     entries = rates_table.size();
     std::cout << "Read " << entries << " EOS entries\n";
@@ -30,7 +30,7 @@ int main(int argc, const char *argv[])
 
     // Read full EOS data
     full_EOS_table full_table;
-    read_full_EOS_table("data/eosls220_low.h5", full_table, &error);
+    full_table.read("data/eosls220_low.h5", &error);
 
     entries = full_table.size();
     std::cout << "Read " << entries << " EOS entries\n";
@@ -73,23 +73,16 @@ int main(int argc, const char *argv[])
         std::vector<element> elements;
         get_abundances(conditions, elements);
 
-        double n_n = 0, n_p = 0;
-
         for(int j = 0; j < elements.size(); ++j)
 	{
             int A = elements[j].A, Z = elements[j].Z;
 	    double abundance = elements[j].abundance;
-            if(A==1)
-            {
-                if(Z==0) n_n = abundance;
-                else n_p = abundance;
-            }
             
             if(A < 2 || Z < 2) continue;
 
             total_abundance += abundance;
             
-            //rates_table.elec_rate_fast_eos[i] += abundance * electron_capture_fit(A, Z, T, degenerate_potential(M_ELECTRON, nb*Y_e));
+            rates_table.elec_rate_fast_eos[i] += abundance * electron_capture_fit(A, Z, T, degenerate_potential(M_ELECTRON, nb*Y_e));
             rates_table.scattering_xs_eos[i] += abundance * nucleus_scattering_cross_section(A, Z, eps_mu, abundance*nb);
             rates_table.elec_rate_tab_eos[i] += elec_capt_heavy_nuclei_effective(mu_e, mu_nu, abundance, T, mu_neut, mu_p, Z, A);
 	}
@@ -113,9 +106,12 @@ int main(int argc, const char *argv[])
         
         rates_table.elec_rate_fast_eos[i] += electron_capture_proton(T, nb, degenerate_potential(M_ELECTRON, nb*Y_e), mu_nu, eta_pn);
         rates_table.elec_rate_fast_eos[i] *= INV_COCO_TIME;
+
+        ++processed;
+        printf("%d / %d\n", processed, rates_table.size());
     }
 
-    write_short_EOS_table("output/sigma_scattering_rate.h5", rates_table, &error);
+    rates_table.write("output/sigma_scattering_rate.h5", &error);
 
     return 0;
 }
