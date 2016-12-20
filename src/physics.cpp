@@ -258,8 +258,8 @@ double  elec_capt_heavy_nuclei_effective(double mue, double mu_nu, double na, do
       borne_inf = x2;
     }
   //while (fabs(x2) < second_eta+100);
-  //while ((fabs((rheavy-rheavyold)/rheavy) > 1e-10) && (x2 < 200));
-  while (fabs(rheavy-rheavyold)/rheavy > 1e-10);
+  while ((fabs((rheavy-rheavyold)/rheavy) > 1e-10) && (x2 < 200));
+  //while (fabs(rheavy-rheavyold)/rheavy > 1e-10);
   delete [] x;
   delete [] w;
   rheavy = rheavy * c / aheavy;

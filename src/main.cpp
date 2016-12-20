@@ -16,21 +16,22 @@ int main(int argc, const char *argv[])
     entries = read_abundance_data("data/abundances/1/eos.compo", "data/abundances/1/eos.t", "data/abundances/1/eos.nb", "data/abundances/1/eos.yq");
     std::cout << "Read " << entries << " nuclear abundance data entries\n";
 
-    // Read rate EOS data
-    short_EOS_table rates_table;
-    int error;
-    rates_table.read("data/elec_capt_rate_ls220.h5", &error);
-    rates_table.write("output/sigma_scattering_rate.h5", &error);
-
-    entries = rates_table.size();
-    std::cout << "Read " << entries << " EOS entries\n";
-
-    
-    rates_table.dump();
-
     // Read full EOS data
     full_EOS_table full_table;
-    full_table.read("data/eosls220_low.h5", &error);
+    //full_table.read("data/eosls220_low.h5", &error);
+    full_table.read("data/eoscompose.h5", EOS_TYPE_COMPOSE);
+
+    // Read rate EOS data
+    short_EOS_table rates_table;
+    rates_table.bind_full_table(full_table);
+    //rates_table.read("data/elec_capt_rate_ls220.h5", &error);
+    rates_table.write("output/sigma_scattering_rate.h5");
+
+    entries = rates_table.size();
+    std::cout << "Read " << entries << " EOS entries (" 
+        << rates_table.m_ln_rho << "x" << rates_table.n_ln_t << "x" << rates_table.o_y_e << ")\n";
+
+    rates_table.dump();
 
     entries = full_table.size();
     std::cout << "Read " << entries << " EOS entries\n";
@@ -46,7 +47,6 @@ int main(int argc, const char *argv[])
     for(int o = 0; o < rates_table.o_y_e; ++o)
     for(int p = 0; p < rates_table.p_mu; ++p)
     {
-        //int i = m*(table.n_ln_t*table.o_y_e*table.p_mu) + n*(table.o_y_e*table.p_mu) + o*table.p_mu + p;
         int i = o*(rates_table.n_ln_t*rates_table.m_ln_rho*rates_table.p_mu) + n*(rates_table.m_ln_rho*rates_table.p_mu) + m*rates_table.p_mu + p;
         int ii = m + n * rates_table.m_ln_rho + o * rates_table.m_ln_rho * rates_table.n_ln_t;
 	
@@ -113,7 +113,7 @@ int main(int argc, const char *argv[])
         printf("%d / %d\n", processed, rates_table.size());
     }
 
-    rates_table.write("output/sigma_scattering_rate.h5", &error);
+    rates_table.write("output/sigma_scattering_rate.h5");
 
     return 0;
 }

@@ -1,3 +1,5 @@
+enum { EOS_TYPE_LOW = 0, EOS_TYPE_COMPOSE };
+
 struct EOS_table
 {
     int m_ln_rho, n_ln_t, o_y_e;
@@ -6,10 +8,12 @@ struct EOS_table
     virtual const int size() { return 0; }
     virtual void allocate() {}
 
-    virtual void read(const char *path, int *error) {}
-    virtual void write(const char *path, int *error) {}
+    virtual int read(const char *path, int type) {}
+    virtual int write(const char *path) {}
 };
 
+
+struct full_EOS_table;
 
 struct short_EOS_table : EOS_table
 {
@@ -17,8 +21,8 @@ struct short_EOS_table : EOS_table
     double *mu_nu_eos, *elec_rate_tab_eos, *elec_rate_single_eos;
     double *scattering_xs_eos, *elec_rate_fast_eos;
 
-    void read(const char *path, int *error);
-    void write(const char *path, int *error);
+    int read(const char *path, int type);
+    int write(const char *path);
 
     void dump()
     {
@@ -31,6 +35,8 @@ struct short_EOS_table : EOS_table
         printf("mu_nu\n");
         for(int p = 0; p < p_mu; ++p) printf("%e\n", mu_nu_eos[p]);
     }
+
+    void bind_full_table(full_EOS_table &t);
 
     const int size()
     {
@@ -61,7 +67,7 @@ struct full_EOS_table : EOS_table
     int *eflg_eos;
     double *mu_nu_effective_frac, *thermo_eos, *yi_eos;
 
-    void read(const char *path, int *error);
+    int read(const char *path, int type = EOS_TYPE_COMPOSE);
 
     const int size()
     {
