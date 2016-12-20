@@ -51,17 +51,19 @@ int main(int argc, const char *argv[])
         int ii = m + n * rates_table.m_ln_rho + o * rates_table.m_ln_rho * rates_table.n_ln_t;
 	
         const double mu_e = -full_table.muq_eos[ii] + full_table.mul_eos[ii], //- 0.51099891;
-	     //mu_nu = full_table.mul_eos[ii],
+	     mu_nu = full_table.mul_eos[ii],
 	     mu_neut = full_table.mub_eos[ii], //- 939.56536; // non relativistic mu
 	     mu_p = full_table.mub_eos[ii] + full_table.muq_eos[ii];
 
-        const double nb = exp(rates_table.ln_rho_eos[m]), T = exp(rates_table.ln_t_eos[n]), Y_e = rates_table.y_e_eos[o], mu_nu = rates_table.mu_nu_eos[p], ec_tab = rates_table.elec_rate_tab_eos[i];
+        const double mu_nu_eff = mu_nu * rates_table.mu_nu_eos[p];
+
+        const double nb = exp(rates_table.ln_rho_eos[m]), T = exp(rates_table.ln_t_eos[n]), Y_e = rates_table.y_e_eos[o], ec_tab = rates_table.elec_rate_tab_eos[i];
 
         const double eta_pn = eta_pn_v3(mu_neut, mu_p, T);
 
         double conditions[3] = {T, nb, Y_e};
 
-        double /*mu_e = degenerate_potential(M_ELECTRON, nb*Y_e),*/ eps_mu = average_neutrino_energy(T, mu_nu);
+        double /*mu_e = degenerate_potential(M_ELECTRON, nb*Y_e),*/ eps_mu = average_neutrino_energy(T, mu_nu_eff);
 
         //printf("%e %e %e\n", T, mu_e, degenerate_potential(M_ELECTRON, nb*Y_e));
         //continue;
@@ -84,10 +86,10 @@ int main(int argc, const char *argv[])
             
             rates_table.elec_rate_fast_eos[i] += abundance * electron_capture_fit(A, Z, T, degenerate_potential(M_ELECTRON, nb*Y_e));
             rates_table.scattering_xs_eos[i] += abundance * nucleus_scattering_cross_section(A, Z, eps_mu, abundance*nb);
-            rates_table.elec_rate_tab_eos[i] += elec_capt_heavy_nuclei_effective(mu_e, mu_nu, abundance, T, mu_neut, mu_p, Z, A);
+            rates_table.elec_rate_tab_eos[i] += elec_capt_heavy_nuclei_effective(mu_e, mu_nu_eff, abundance, T, mu_neut, mu_p, Z, A);
 	}
 
-        const double rb = elec_capt_proton_effective(mu_e, mu_nu, T, mu_neut, mu_p, full_table.xp_eos[ii], full_table.xn_eos[ii], eta_pn);
+        const double rb = elec_capt_proton_effective(mu_e, mu_nu_eff, T, mu_neut, mu_p, full_table.xp_eos[ii], full_table.xn_eos[ii], eta_pn);
         rates_table.elec_rate_tab_eos[i] += rb/nb;
         rates_table.elec_rate_single_eos[i] += rb/nb;
         double rheavy = 0; 
@@ -96,7 +98,7 @@ int main(int argc, const char *argv[])
 	{
 	    // ott table
 	    //xheavy_eos[index] = xheavy_eos[index] / aheavy_eos[index];
-	    rates_table.elec_rate_single_eos[i] += elec_capt_heavy_nuclei_effective(mu_e, mu_nu, full_table.xheavy_eos[ii], T, mu_neut, mu_p, full_table.zheavy_eos[ii], full_table.aheavy_eos[ii]);
+	    rates_table.elec_rate_single_eos[i] += elec_capt_heavy_nuclei_effective(mu_e, mu_nu_eff, full_table.xheavy_eos[ii], T, mu_neut, mu_p, full_table.zheavy_eos[ii], full_table.aheavy_eos[ii]);
 	} 
 	 /* eta_np en fm-3 compens\E9 par rho en fm-3
 	  facteur 1e39 dans calc_rate compens\E9 ici
