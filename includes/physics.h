@@ -69,6 +69,39 @@ double nucleus_scattering_cross_section(int A, int Z, double eta, double eps_neu
 // Bruno Peres
 double  elec_capt_proton_effective(double mu_e, double mu_nu, double t, double muneut, double mup, double y_p, double y_n, double eta_pn);
 double  elec_capt_heavy_nuclei_effective(double mue, double mu_nu, double na, double t, double muneut, double mup, double zheavy, double aheavy);
-void gausslegendre(int n,double x1,double x2,double* x,double* w);
 double eta_np_v3(double mun, double mup, double t);
 double eta_pn_v3(double mun, double mup, double t);
+
+inline void gausslegendre(int n,double x1,double x2,double* x,double* w) 
+{  
+  int j,m;
+  double p1, p2, p3, pp, xl, xm, z, z1;
+  //const double eps = 1e-15;
+  const double eps = 1e-6;
+  m=(n+1)/2;
+  xm=0.5*(x2+x1);
+  xl=0.5*(x2-x1);
+  // debut boucle 
+  for (int i=1;i<=m;i++)
+  {
+    z=cos(M_PI*(double(i) - 0.25)/(double(n) + 0.5));
+    int count = 0;
+    do {
+    p1 = 1;
+    p2 = 0;
+    for (j=1;j<=n;j++)
+    {
+      p3 = p2;
+      p2 = p1;
+      p1 = ((2*j - 1)* z * p2 - (j - 1)*p3)/j;
+    }
+    pp = n * (z * p1 - p2)/(z*z - 1);
+    z1 = z;
+    z = z1 - p1/pp;}
+    while(fabs(z-z1) > eps && ++count < 64);
+    x[i] = xm - xl * z;
+    x[n+1-i] = xm + xl * z;
+    w[i] = 2 * xl / ((1 - z*z) * pp * pp);
+    w[n+1-i] = w[i];
+  }
+}

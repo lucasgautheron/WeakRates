@@ -19,6 +19,7 @@ int main(int argc, const char *argv[])
     std::cout << "Read " << entries << " nuclear data entries\n";
 
     // Read abundance data
+    std::cout << "Reading compose data from " << argv[1] << "...\n";
     entries = read_abundance_data(argv[1]);
     std::cout << "Read " << entries << " nuclear abundance data entries\n";
 
@@ -31,7 +32,7 @@ int main(int argc, const char *argv[])
     short_EOS_table rates_table;
     rates_table.bind_full_table(full_table);
     //rates_table.read("data/elec_capt_rate_ls220.h5", &error);
-    rates_table.write("output/sigma_scattering_rate.h5");
+    //rates_table.write("output/sigma_scattering_rate.h5");
 
     entries = rates_table.size();
     std::cout << "Read " << entries << " EOS entries (" 
@@ -96,7 +97,7 @@ int main(int argc, const char *argv[])
             rates_table.elec_rate_tab_eos[i] += elec_capt_heavy_nuclei_effective(mu_e, mu_nu_eff, abundance, T, mu_neut, mu_p, Z, A);
 	}
 
-        const double rb = 0;//elec_capt_proton_effective(mu_e, mu_nu_eff, T, mu_neut, mu_p, full_table.xp_eos[ii], full_table.xn_eos[ii], eta_pn);
+        const double rb = elec_capt_proton_effective(mu_e, mu_nu_eff, T, mu_neut, mu_p, full_table.xp_eos[ii], full_table.xn_eos[ii], eta_pn);
         rates_table.elec_rate_tab_eos[i] += rb/nb;
         rates_table.elec_rate_single_eos[i] += rb/nb;
 		 
@@ -105,7 +106,7 @@ int main(int argc, const char *argv[])
 	    // ott table
 	    //xheavy_eos[index] = xheavy_eos[index] / aheavy_eos[index];
 	    rates_table.elec_rate_single_eos[i] += elec_capt_heavy_nuclei_effective(mu_e, mu_nu_eff, full_table.xheavy_eos[ii], T, mu_neut, mu_p, full_table.zheavy_eos[ii], full_table.aheavy_eos[ii]);
-	} 
+	}
 	 /* eta_np en fm-3 compens\E9 par rho en fm-3
 	  facteur 1e39 dans calc_rate compens\E9 ici
 	  tout le reste en MeV, cm, s jusqu'ici */

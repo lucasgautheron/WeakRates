@@ -376,6 +376,11 @@ int short_EOS_table::write(const char *path)
   H5Dwrite(dataset, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, this->elec_rate_single_eos);
   H5Dclose (dataset);
 
+  dataset = H5Dcreate2(file, "elec_capt_fast_rate", H5T_NATIVE_DOUBLE, dataspace, 
+                          H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+  H5Dwrite(dataset, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, this->elec_rate_fast_eos);
+  H5Dclose (dataset);
+
 
   dataset = H5Dcreate2(file, "sigma_scattering_nuclei", H5T_NATIVE_DOUBLE, dataspace, 
                           H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);

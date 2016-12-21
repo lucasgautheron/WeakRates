@@ -18,8 +18,8 @@ inline double SEMF(int A, int Z)
 {
     const double a_V = 15.8, a_S = 18.3, a_C = 0.714, a_A = 23.2, a_P = 12;
     const double delta_0 = a_P/sqrt(A);
-    const double delta = A&1 ? 0 : delta_0 * (Z&1 ? -1 : 1);
-    const double B = a_V * A - a_S * pow(A, 2./3.) - a_C * Z*Z/pow(A, 1./3.) - a_A*pow(A-2*Z, 2.)/A+delta;
+    const double delta = A&1 ? 0 : (Z&1 ? -delta_0 : delta_0);
+    const double B = a_V * A - a_S * pow(A, 2./3.) - a_C * Z*Z/pow(A, 1./3.) - a_A*(A-2*Z)*(A-2*Z)/A+delta;
     return Z*M_PROTON+(A-Z)*M_NEUTRON-B;
 }
 

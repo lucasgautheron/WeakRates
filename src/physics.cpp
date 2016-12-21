@@ -152,7 +152,7 @@ double  elec_capt_proton_effective(double mu_e, double mu_nu, double t, double m
       rproton = rproton + resultat;
       borne_inf = x2;
     }
-  while (fabs((rproton-rprotonold)/rproton) > 1e-10);
+  while (fabs((rproton-rprotonold)/rproton) > 1e-10 && (fabs(x2) < second_zero+100));
   //while (fabs((rproton-rprotonold)/rproton) > 1e-10);
   //while (fabs(x2) < second_zero+100);
   delete [] x;
@@ -317,7 +317,8 @@ double eta_pn_v3(double mun, double mup, double t)
   double h_bar_c = 197.3269631; // MeV.fm
   double borne_inf, resultat, eta_pn_tot, eta_pn_old;
   borne_inf = 0;
-  int n = 64;
+  //const int n = 64;
+  const int n = 32;
   int count = 0;
   double x1,x2;
   double* x = new double[n];
@@ -343,36 +344,4 @@ double eta_pn_v3(double mun, double mup, double t)
   delete [] w;
   eta_pn_tot = eta_pn_tot / pow(h_bar_c,3); // converts MeV^3 into fm^-3
   return eta_pn_tot; // fm^-3 
-}
-
-void gausslegendre(int n,double x1,double x2,double* x,double* w) 
-{  
-  int j,m;
-  double p1, p2, p3, pp, xl, xm, z, z1;
-  double eps = 1e-15;
-  m=(n+1)/2;
-  xm=0.5*(x2+x1);
-  xl=0.5*(x2-x1);
-  // debut boucle 
-  for (int i=1;i<=m;i++)
-  {
-    z=cos(M_PI*(double(i) - 0.25)/(double(n) + 0.5));
-    do {
-    p1 = 1;
-    p2 = 0;
-    for (j=1;j<=n;j++)
-    {
-      p3 = p2;
-      p2 = p1;
-      p1 = ((2*j - 1)* z * p2 - (j - 1)*p3)/j;
-    }
-    pp = n * (z * p1 - p2)/(z*z - 1);
-    z1 = z;
-    z = z1 - p1/pp;}
-    while(fabs(z-z1) > eps);
-    x[i] = xm - xl * z;
-    x[n+1-i] = xm + xl * z;
-    w[i] = 2 * xl / ((1 - z*z) * pp * pp);
-    w[n+1-i] = w[i];
-  }
 }
