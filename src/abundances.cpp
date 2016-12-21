@@ -50,13 +50,13 @@ int read_index(const char *path, std::vector<double> &index)
     return count-2;
 }
 
-int read_abundance_data(const char *path_abundances, const char *path_temperatures, const char *path_densities, const char *path_fractions)
+int read_abundance_data(const char *path)
 {
-    read_index(path_temperatures, table.parameters[0]);
-    read_index(path_densities, table.parameters[1]);
-    read_index(path_fractions, table.parameters[2]);
+    read_index((std::string(path)+"/eos.t").c_str(), table.parameters[0]);
+    read_index((std::string(path)+"/eos.nb").c_str(), table.parameters[1]);
+    read_index((std::string(path)+"/eos.yq").c_str(), table.parameters[2]);
 
-    std::ifstream infile(path_abundances);
+    std::ifstream infile((std::string(path)+"/eos.compo").c_str());
     
     int int_ph;
     int count = 0;

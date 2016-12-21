@@ -2,6 +2,12 @@
 
 int main(int argc, const char *argv[])
 {
+    if(argc < 2)
+    {
+        std::cout << "Missing compose model! Can't run any further.\n";
+        return 1;
+    }
+
     // read EOS table
     // read abundances
     // browse EOS table and compute rates
@@ -13,7 +19,7 @@ int main(int argc, const char *argv[])
     std::cout << "Read " << entries << " nuclear data entries\n";
 
     // Read abundance data
-    entries = read_abundance_data("data/abundances/1/eos.compo", "data/abundances/1/eos.t", "data/abundances/1/eos.nb", "data/abundances/1/eos.yq");
+    entries = read_abundance_data(argv[1]);
     std::cout << "Read " << entries << " nuclear abundance data entries\n";
 
     // Read full EOS data
@@ -87,7 +93,7 @@ int main(int argc, const char *argv[])
             
             rates_table.elec_rate_fast_eos[i] += abundance * electron_capture_fit(A, Z, T, degenerate_potential(M_ELECTRON, nb*Y_e));
             rates_table.scattering_xs_eos[i] += abundance * nucleus_scattering_cross_section(A, Z, eta, eps_mu, abundance*nb);
-            //rates_table.elec_rate_tab_eos[i] += elec_capt_heavy_nuclei_effective(mu_e, mu_nu_eff, abundance, T, mu_neut, mu_p, Z, A);
+            rates_table.elec_rate_tab_eos[i] += elec_capt_heavy_nuclei_effective(mu_e, mu_nu_eff, abundance, T, mu_neut, mu_p, Z, A);
 	}
 
         const double rb = 0;//elec_capt_proton_effective(mu_e, mu_nu_eff, T, mu_neut, mu_p, full_table.xp_eos[ii], full_table.xn_eos[ii], eta_pn);
@@ -98,7 +104,7 @@ int main(int argc, const char *argv[])
 	{
 	    // ott table
 	    //xheavy_eos[index] = xheavy_eos[index] / aheavy_eos[index];
-	    //rates_table.elec_rate_single_eos[i] += elec_capt_heavy_nuclei_effective(mu_e, mu_nu_eff, full_table.xheavy_eos[ii], T, mu_neut, mu_p, full_table.zheavy_eos[ii], full_table.aheavy_eos[ii]);
+	    rates_table.elec_rate_single_eos[i] += elec_capt_heavy_nuclei_effective(mu_e, mu_nu_eff, full_table.xheavy_eos[ii], T, mu_neut, mu_p, full_table.zheavy_eos[ii], full_table.aheavy_eos[ii]);
 	} 
 	 /* eta_np en fm-3 compens\E9 par rho en fm-3
 	  facteur 1e39 dans calc_rate compens\E9 ici

@@ -1,0 +1,13 @@
+# order of interpolation scheme in T, nb, Y_q
+3 3 3
+# calculation of beta equailibrium (1) or not (else)
+0
+# tabulation scheme (0 = explicit listing, 1 = loops, see manual)
+0
+# parameter values (T, nb, Yq) depending on tabulation scheme
+5
+0.1 0.1 0.5
+0.1 0.2 0.5
+0.1 0.3 0.5
+0.1 0.4 0.5
+0.1 0.5 0.5
