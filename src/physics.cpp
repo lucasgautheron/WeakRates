@@ -93,8 +93,8 @@ double  elec_capt_proton_effective(double mu_e, double mu_nu, double t, double m
   q = 1.2935; // MeV
   ga = 1.2695;
   g_squared = 5.2971899e-5; // (MeV-2 cm2) * 1e39  
-  double me_c2 = 0.51099891; // MeV
-  double h_bar_c = 197.3269631*1e-13; // MeV cm
+  double me_c2 = M_ELECTRON; // MeV
+  double h_bar_c = HBARC_CM; // MeV cm
   double c = 29979245800; //cm s-1
   /* integration */
   double rproton = 0;
@@ -105,7 +105,7 @@ double  elec_capt_proton_effective(double mu_e, double mu_nu, double t, double m
   first_zero = min(mu_nu,mu_e-q);
   second_zero = max(mu_nu,mu_e-q);
   borne_inf = 0;
-  int n = 64;
+  const int n = 64;
   double x1,x2;
   double* x = new double[n];
   double* w = new double[n];
@@ -167,8 +167,8 @@ double  elec_capt_heavy_nuclei_effective(double mue, double mu_nu, double na, do
   ga = 1.2695;
   g_squared = 5.2971899e-5; // (MeV-2 cm2) *1e39
   double c = 29979245800; //cm s-1
-  double me_c2 = 0.51099891; // MeV
-  double h_bar_c = 197.3269631e-13; // MeV cm 
+  double me_c2 = M_ELECTRON; // MeV
+  double h_bar_c = HBARC_CM; // MeV cm 
   /* calcul de Np et Nh */
   double nheavy;
   nheavy = aheavy - zheavy;
@@ -215,7 +215,7 @@ double  elec_capt_heavy_nuclei_effective(double mue, double mu_nu, double na, do
   first_eta = min(eta_nu,eta_e);
   second_eta = max(eta_nu,eta_e);
   borne_inf = me_c2 - q;
-  int n = 64;
+  const int n = 64;
   double x1,x2;
   double* x = new double[n];
   double* w = new double[n];
@@ -273,11 +273,11 @@ double  elec_capt_heavy_nuclei_effective(double mue, double mu_nu, double na, do
 
 double eta_np_v3(double mun, double mup, double t)
 {
-  double mp_c2 = 938.272013; // MeV
-  double mn_c2 = 939.56536; // MeV (booklet p.126)
+  double mp_c2 = M_PROTON; // MeV
+  double mn_c2 = M_NEUTRON; // MeV (booklet p.126)
   double eta_n = mun / t;
   double eta_p = mup / t;
-  double h_bar_c = 197.3269631; // MeV.fm
+  double h_bar_c = HBARC_FM; // MeV.fm
   double borne_inf, resultat, eta_np_tot, eta_np_old;
   borne_inf = 0;
   int n = 64;
