@@ -67,7 +67,7 @@ int main(int argc, const char *argv[])
         const double mu_nu_eff = mu_nu * rates_table.mu_nu_eos[p],
                      eta = -mu_nu_eff / T;
 
-        const double eta_pn = eta_pn_v3(mu_neut, mu_p, T);
+        //const double eta_pn = eta_pn_v3(mu_neut, mu_p, T);
 
         double conditions[3] = {T, nb, Y_e};
 
@@ -80,6 +80,7 @@ int main(int argc, const char *argv[])
         rates_table.elec_rate_fast_eos[i] = rates_table.elec_rate_tab_eos[i] = rates_table.scattering_xs_eos[i] = 0;
 
         double total_abundance = 0;
+        double n_n = 0, n_p = 0;
         std::vector<element> elements;
         get_abundances(conditions, elements);
 
@@ -87,33 +88,36 @@ int main(int argc, const char *argv[])
 	{
             int A = elements[j].A, Z = elements[j].Z;
 	    double abundance = elements[j].abundance;
+
+            if(A == 1)
+            {
+                if(Z == 0) n_n = abundance;
+                else n_p = abundance;
+            }
             
             if(A < 2 || Z < 2) continue;
 
             total_abundance += abundance;
             
-            rates_table.elec_rate_fast_eos[i] += abundance * electron_capture_fit(A, Z, T, degenerate_potential(M_ELECTRON, nb*Y_e));
+            //rates_table.elec_rate_fast_eos[i] += abundance * electron_capture_fit(A, Z, T, degenerate_potential(M_ELECTRON, nb*Y_e));
             rates_table.scattering_xs_eos[i] += abundance * nucleus_scattering_cross_section(A, Z, eta, eps_mu, abundance*nb);
             rates_table.elec_rate_tab_eos[i] += elec_capt_heavy_nuclei_effective(mu_e, mu_nu_eff, abundance, T, mu_neut, mu_p, Z, A);
 	}
 
-        const double rb = elec_capt_proton_effective(mu_e, mu_nu_eff, T, mu_neut, mu_p, full_table.xp_eos[ii], full_table.xn_eos[ii], eta_pn);
+        /*const double rb = elec_capt_proton_effective(mu_e, mu_nu_eff, T, mu_neut, mu_p, full_table.xp_eos[ii], full_table.xn_eos[ii], eta_pn);
         rates_table.elec_rate_tab_eos[i] += rb/nb;
-        rates_table.elec_rate_single_eos[i] += rb/nb;
+        rates_table.elec_rate_single_eos[i] += rb/nb;*/
 		 
-	if ((full_table.xheavy_eos[ii] > 0.) && (full_table.aheavy_eos[ii] > 0.))
+	/*if ((full_table.xheavy_eos[ii] > 0.) && (full_table.aheavy_eos[ii] > 0.))
 	{
 	    // ott table
 	    //xheavy_eos[index] = xheavy_eos[index] / aheavy_eos[index];
 	    rates_table.elec_rate_single_eos[i] += elec_capt_heavy_nuclei_effective(mu_e, mu_nu_eff, full_table.xheavy_eos[ii], T, mu_neut, mu_p, full_table.zheavy_eos[ii], full_table.aheavy_eos[ii]);
-	}
-	 /* eta_np en fm-3 compens\E9 par rho en fm-3
-	  facteur 1e39 dans calc_rate compens\E9 ici
-	  tout le reste en MeV, cm, s jusqu'ici */
+	} 
 	rates_table.elec_rate_tab_eos[i] *= 1e-39 * INV_COCO_TIME; 
-        rates_table.elec_rate_single_eos[i] *= 1e-39 * INV_COCO_TIME;
+        rates_table.elec_rate_single_eos[i] *= 1e-39 * INV_COCO_TIME;*/
         
-        rates_table.elec_rate_fast_eos[i] += electron_capture_proton(T, nb, degenerate_potential(M_ELECTRON, nb*Y_e), mu_nu, eta_pn);
+        rates_table.elec_rate_fast_eos[i] += electron_capture_proton(T, nb, degenerate_potential(M_ELECTRON, nb*Y_e), mu_nu, eta_nucl(T, n_p, n_n, mu_p-M_PROTON, mu_neut-M_NEUTRON));
         rates_table.elec_rate_fast_eos[i] *= INV_COCO_TIME;
 
         ++processed;

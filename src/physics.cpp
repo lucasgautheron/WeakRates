@@ -152,9 +152,9 @@ double  elec_capt_proton_effective(double mu_e, double mu_nu, double t, double m
       rproton = rproton + resultat;
       borne_inf = x2;
     }
-  while (fabs((rproton-rprotonold)/rproton) > 1e-10 && (fabs(x2) < second_zero+100));
+  while (fabs((rproton-rprotonold)/rproton) > 1e-10 && fabs(x2) < second_zero+100);
   //while (fabs((rproton-rprotonold)/rproton) > 1e-10);
-  //while (fabs(x2) < second_zero+100);
+  //while (++);
   delete [] x;
   delete [] w;
   rproton = rproton * c;
