@@ -61,6 +61,10 @@ inline double fermi_dirac(double E, double mu, double T)
 double electron_capture_fit(int A, int Z, double T, double mu_e = M_ELECTRON, double Q = 1e10);
 
 // Bruenn 1985
+inline double eta_nucl(double T, double n1, double n2, double mu1, double mu2)
+{
+    return (n1-n2)/(exp((mu1-mu2)/T)-1);
+}
 double electron_capture_proton(double T, double nb, double mu_e, double mu_nu, double eta_pn);
 
 // Bruenn 1985 + Horowitz 1997
