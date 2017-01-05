@@ -101,21 +101,21 @@ int main(int argc, const char *argv[])
             
             //rates_table.elec_rate_fast_eos[i] += abundance * electron_capture_fit(A, Z, T, degenerate_potential(M_ELECTRON, nb*Y_e));
             rates_table.scattering_xs_eos[i] += abundance * nucleus_scattering_cross_section(A, Z, eta, eps_mu, abundance*nb);
-            rates_table.elec_rate_tab_eos[i] += elec_capt_heavy_nuclei_effective(mu_e, mu_nu_eff, abundance, T, mu_neut, mu_p, Z, A);
+            //rates_table.elec_rate_tab_eos[i] += elec_capt_heavy_nuclei_effective(mu_e, mu_nu_eff, abundance, T, mu_neut, mu_p, Z, A);
 	}
 
-        /*const double rb = elec_capt_proton_effective(mu_e, mu_nu_eff, T, mu_neut, mu_p, full_table.xp_eos[ii], full_table.xn_eos[ii], eta_pn);
+        const double rb = elec_capt_proton_effective(mu_e, mu_nu_eff, T, mu_neut, mu_p, full_table.xp_eos[ii], full_table.xn_eos[ii], /*eta_pn*/eta_nucl(T, n_p, n_n, mu_p-M_PROTON, mu_neut-M_NEUTRON));
         rates_table.elec_rate_tab_eos[i] += rb/nb;
-        rates_table.elec_rate_single_eos[i] += rb/nb;*/
+        rates_table.elec_rate_single_eos[i] += rb/nb;
 		 
 	/*if ((full_table.xheavy_eos[ii] > 0.) && (full_table.aheavy_eos[ii] > 0.))
 	{
 	    // ott table
 	    //xheavy_eos[index] = xheavy_eos[index] / aheavy_eos[index];
 	    rates_table.elec_rate_single_eos[i] += elec_capt_heavy_nuclei_effective(mu_e, mu_nu_eff, full_table.xheavy_eos[ii], T, mu_neut, mu_p, full_table.zheavy_eos[ii], full_table.aheavy_eos[ii]);
-	} 
+	} */
 	rates_table.elec_rate_tab_eos[i] *= 1e-39 * INV_COCO_TIME; 
-        rates_table.elec_rate_single_eos[i] *= 1e-39 * INV_COCO_TIME;*/
+        rates_table.elec_rate_single_eos[i] *= 1e-39 * INV_COCO_TIME;
         
         rates_table.elec_rate_fast_eos[i] += electron_capture_proton(T, nb, degenerate_potential(M_ELECTRON, nb*Y_e), mu_nu, eta_nucl(T, n_p, n_n, mu_p-M_PROTON, mu_neut-M_NEUTRON));
         rates_table.elec_rate_fast_eos[i] *= INV_COCO_TIME;

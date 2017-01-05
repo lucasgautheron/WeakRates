@@ -29,6 +29,21 @@ double electron_capture_fit(int A, int Z, double T, double mu_e, double Q)
     return rate;
 }
 
+double electron_capture_ps(double T, double mu_e, double mu_nu, double Q)
+{
+    double integral = 0;
+    const int N = 256;
+    double Emin = max(0, M_ELECTRON-Q), Emax = 30*T;
+    const double dE = (Emax-Emin)/double(N);
+    for(int i = 0; i < N; ++i)
+    {
+        const double E = Emin + (Emax-Emin)*(double(i)+0.5)/double(N);
+        integral += E * E * (1-fermi_dirac(E, mu_nu, T)) * fermi_dirac(E+Q, mu_e, T) * (E+Q)*(E+Q) * dE;
+    }
+    return integral;
+
+}
+
 // Bruenn 1985
 double electron_capture_proton(double T, double nb, double mu_e, double mu_nu, double eta_pn)
 {

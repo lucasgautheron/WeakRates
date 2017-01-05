@@ -11,14 +11,14 @@ OBJS=$(subst .cpp,.o,$(SRCS))
 OBJS_TESTS=$(subst .cpp,.o,$(SRCS_TESTS))
 DEPS=$(wildcard includes/*.h)
 
-all: $(OBJS) $(DEPS)
+all: $(OBJS) $(OBJS_TESTS) $(DEPS)
 	$(CXX) $(LDFLAGS) -o run $(OBJS) $(LDLIBS) 
-	#$(CXX) $(LDFLAGS) -o tests $(OBJS_TESTS) $(LDLIBS) 
+	$(CXX) $(LDFLAGS) -o tests $(OBJS_TESTS) $(LDLIBS) 
 
 main.o: src/main.cpp $(DEPS)
 	$(CXX) $(CPPFLAGS) -c src/main.cpp
 
-#tests.o: src/tests.cpp $(DEPS)
+tests.o: src/tests.cpp $(DEPS)
 	$(CXX) $(CPPFLAGS) -c src/tests.cpp
 
 eos.o: src/eos.cpp $(DEPS)

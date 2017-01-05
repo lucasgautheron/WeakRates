@@ -112,3 +112,6 @@ struct full_EOS_table : EOS_table
         yi_eos = new double[s * 3];
     }
 };
+
+void copyfile(const char *source, const char *destination);
+void compile_compose_data(const char *path);

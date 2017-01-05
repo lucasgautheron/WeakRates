@@ -69,6 +69,14 @@ int short_EOS_table::read(const char *path, int type)
   status = H5Dread (dataset, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, this->elec_rate_tab_eos);
   H5Dclose (dataset);
 
+  dataset = H5Dopen (file, "elec_capt_fast_rate");
+  status = H5Dread (dataset, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, this->elec_rate_fast_eos);
+  H5Dclose (dataset);
+
+dataset = H5Dopen (file, "elec_capt_single_rate");
+  status = H5Dread (dataset, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, this->elec_rate_single_eos);
+  H5Dclose (dataset);
+
   // close file
   status = H5Fclose (file);
 }
@@ -391,4 +399,23 @@ int short_EOS_table::write(const char *path)
   // close file
   status = H5Fclose (file);
   return 0;
+}
+
+void copyfile(const char *source, const char *destination)
+{
+    std::ifstream src(source, std::ios::binary);
+    std::ofstream dst(destination, std::ios::binary);
+    dst << src.rdbuf();
+}
+
+void compile_compose_data(const char *path)
+{
+    copyfile((std::string(path)+"/eos.t").c_str(), "compose/eos.t");
+    copyfile((std::string(path)+"/eos.nb").c_str(), "compose/eos.nb");
+    copyfile((std::string(path)+"/eos.yq").c_str(), "compose/eos.yq");
+    copyfile((std::string(path)+"/eos.thermo").c_str(), "compose/eos.thermo");
+    copyfile((std::string(path)+"/eos.compo").c_str(), "compose/eos.compo");
+    copyfile((std::string(path)+"/eos.micro").c_str(), "compose/eos.micro");
+    system("cd compose && ./compose");
+
 }
