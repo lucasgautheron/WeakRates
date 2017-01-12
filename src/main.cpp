@@ -86,7 +86,7 @@ int main(int argc, const char *argv[])
         const double nb = exp(rates_table.ln_rho_eos[m]), T = exp(rates_table.ln_t_eos[n]), Y_e = rates_table.y_e_eos[o], ec_tab = rates_table.elec_rate_tab_eos[i];
 
         const double mu_nu_eff = mu_nu * rates_table.mu_nu_eos[p],
-                     eta = -mu_nu_eff / T;
+                     eta = mu_nu_eff / T;
 
         //const double eta_pn = eta_pn_v3(mu_neut, mu_p, T);
 
