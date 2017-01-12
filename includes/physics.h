@@ -1,3 +1,5 @@
+#define SQUARE(x) ((x)*(x))
+#define CUBIC(x) ((x)*(x)*(x))
 
 inline double gas_density(double T, double x, double mass, const int g = 2) // x = mu/m
 {

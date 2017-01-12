@@ -76,15 +76,15 @@ double nucleus_scattering_cross_section(int A, int Z, double eta, double eps_neu
 
     double y_bruenn = 2.0 / 5.0 * pow(1.07 * A, 2./3.) * pow(eps_neutrino, 2.) / (HBARC_CM * 1.0e13);
 
-    double sigma_scattering_nucleus = pow(eps_neutrino, 2) * (SIGMA_ZERO / 16.0) 
-      / pow(M_ELECTRON, 2) * pow(A, 2) * pow(((c_a - c_v) + (2 - c_a - c_v) 
-      * (2 * Z - A) / A), 2) * (y_bruenn - 1 + 
-      (1 + y_bruenn) * exp(-2*y_bruenn)) / pow(y_bruenn, 3);
+    double sigma_scattering_nucleus = SQUARE(eps_neutrino) * (SIGMA_ZERO / 16.0) 
+      / SQUARE(M_ELECTRON) * SQUARE(A) * SQUARE(((c_a - c_v) + (2 - c_a - c_v) 
+      * (2 * Z - A) / A)) * (y_bruenn - 1 + 
+      (1 + y_bruenn) * exp(-2*y_bruenn)) / CUBIC(y_bruenn);
 
     // ion-ion correlation
     double a_ion = pow((4.0 * M_PI / 3.0) * density, -1. / 3.);
 
-    double gamma_ion = pow(Z, 2) * 7.2973525376e-3 * HBARC_CM 
+    double gamma_ion = SQUARE(Z) * 7.2973525376e-3 * HBARC_CM 
       / (a_ion * eps_neutrino);
 
     double s_ion = 1.0 / (1.0 + exp((-1.0 * a_ion * eps_neutrino 
