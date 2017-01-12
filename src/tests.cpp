@@ -73,7 +73,7 @@ int main(int argc, const char *argv[])
         double /*mu_e = degenerate_potential(M_ELECTRON, nb*Y_e),*/ eps_mu = average_neutrino_energy(T, mu_nu_eff);
 
         if(T > 0.01 && T < 5 && nb > 1e-8 && nb < 1e-2 && Y_e > 0.1)
-        fprintf(fp, "%e %e %.3f %e %e %e %e %e\n", T, nb, Y_e, mu_nu_eff, rates_table.elec_rate_tab_eos[i], output_table.elec_rate_fast_eos[i], output_table.elec_rate_tab_eos[i], output_table.scattering_xs_eos[i]);
+        fprintf(fp, "%e %e %.3f %e %e %e %e %e\n", T, nb, Y_e, mu_nu_eff, rates_table.elec_rate_tab_eos[i], output_table.elec_rate_fast_eos[i], output_table.elec_rate_tab_eos[i], output_table.scattering_xs_nu_eos[i]);
 
         //printf("%e %e %e\n", T, mu_e, degenerate_potential(M_ELECTRON, nb*Y_e));
         //continue;
