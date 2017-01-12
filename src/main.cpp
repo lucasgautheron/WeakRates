@@ -24,19 +24,28 @@ int main(int argc, const char *argv[])
 
     if(!custom_eos_table)
     {
-        // Compile HDF5 from compose files
-        std::cout << "Compiling HDF5 from compose files " << argv[1] << "...\n";
-        compile_compose_data(argv[1]);
+        // Compile HDF5 from compose files if necessary
+        std::string output_table = std::string(compose_path)+"/table.h5";
+        std::ifstream f(output_table.c_str());
+        if(!(bool)f)
+        {
+            std::cout << "Compiling HDF5 from compose files " << compose_path << "...\n";
+            std::cout << "(This can take a long time).\n";
+            compile_compose_data(compose_path);
+            system((std::string("mv compose/eoscompose.h5 ") + output_table).c_str());
+        }
+        f.close();
     }
 
     // Read abundance data
-    std::cout << "Reading compose data from " << argv[1] << "...\n";
-    entries = read_abundance_data(argv[1]);
+    std::cout << "Reading abundance data from " << compose_path << "...\n";
+    entries = read_abundance_data(compose_path);
     std::cout << "Read " << entries << " nuclear abundance data entries\n";
 
     // Read full EOS data
     full_EOS_table full_table;
-    full_table.read(custom_eos_table ? custom_eos_table : "compose/", custom_eos_table ? EOS_TYPE_LOW : EOS_TYPE_COMPOSE);
+    full_table.read(custom_eos_table ? custom_eos_table : (std::string(compose_path)+"/table.h5").c_str(),
+                    custom_eos_table ? EOS_TYPE_LOW : EOS_TYPE_COMPOSE);
     // "data/eosls220_low.h5"
     //full_table.read("data/eoscompose.h5", EOS_TYPE_COMPOSE);
 
@@ -83,13 +92,14 @@ int main(int argc, const char *argv[])
 
         double conditions[3] = {T, nb, Y_e};
 
-        double /*mu_e = degenerate_potential(M_ELECTRON, nb*Y_e),*/ eps_mu = average_neutrino_energy(T, mu_nu_eff);
+        double /*mu_e = degenerate_potential(M_ELECTRON, nb*Y_e),*/ eps_mu = average_neutrino_energy(T, mu_nu_eff), eps_mu_bar = average_neutrino_energy(T, -mu_nu_eff);
 
         //printf("%e %e %e\n", T, mu_e, degenerate_potential(M_ELECTRON, nb*Y_e));
         //continue;
 
         rates_table.elec_rate_single_eos[i] = 0;
-        rates_table.elec_rate_fast_eos[i] = rates_table.elec_rate_tab_eos[i] = rates_table.scattering_xs_eos[i] = 0;
+        rates_table.elec_rate_fast_eos[i] = rates_table.elec_rate_tab_eos[i] = 0;
+        rates_table.scattering_xs_nu_eos[i] = rates_table.scattering_xs_nu_bar_eos[i] = rates_table.scattering_xs_nu_x_eos[i] = 0;
 
         double total_abundance = 0;
         double n_n = 0, n_p = 0;
@@ -112,13 +122,15 @@ int main(int argc, const char *argv[])
             total_abundance += abundance;
             
             //rates_table.elec_rate_fast_eos[i] += abundance * electron_capture_fit(A, Z, T, degenerate_potential(M_ELECTRON, nb*Y_e));
-            rates_table.scattering_xs_eos[i] += abundance * nucleus_scattering_cross_section(A, Z, eta, eps_mu, abundance*nb);
+            rates_table.scattering_xs_nu_eos[i] += abundance * nucleus_scattering_cross_section(A, Z, eta, eps_mu, abundance*nb);
+            rates_table.scattering_xs_nu_bar_eos[i] += abundance * nucleus_scattering_cross_section(A, Z, -eta, eps_mu_bar, abundance*nb);
+            rates_table.scattering_xs_nu_x_eos[i] += abundance * nucleus_scattering_cross_section(A, Z, 0, 3.1513743717389 * T, abundance*nb);
             //rates_table.elec_rate_tab_eos[i] += elec_capt_heavy_nuclei_effective(mu_e, mu_nu_eff, abundance, T, mu_neut, mu_p, Z, A);
 	}
 
-        const double rb = elec_capt_proton_effective(mu_e, mu_nu_eff, T, mu_neut, mu_p, full_table.xp_eos[ii], full_table.xn_eos[ii], /*eta_pn*/eta_nucl(T, n_p, n_n, mu_p-M_PROTON, mu_neut-M_NEUTRON));
-        rates_table.elec_rate_tab_eos[i] += rb/nb;
-        rates_table.elec_rate_single_eos[i] += rb/nb;
+        //const double rb = elec_capt_proton_effective(mu_e, mu_nu_eff, T, mu_neut, mu_p, full_table.xp_eos[ii], full_table.xn_eos[ii], /*eta_pn*/eta_nucl(T, n_p, n_n, mu_p-M_PROTON, mu_neut-M_NEUTRON));
+        //rates_table.elec_rate_tab_eos[i] += rb/nb;
+        //rates_table.elec_rate_single_eos[i] += rb/nb;
 		 
 	/*if ((full_table.xheavy_eos[ii] > 0.) && (full_table.aheavy_eos[ii] > 0.))
 	{
@@ -126,11 +138,12 @@ int main(int argc, const char *argv[])
 	    //xheavy_eos[index] = xheavy_eos[index] / aheavy_eos[index];
 	    rates_table.elec_rate_single_eos[i] += elec_capt_heavy_nuclei_effective(mu_e, mu_nu_eff, full_table.xheavy_eos[ii], T, mu_neut, mu_p, full_table.zheavy_eos[ii], full_table.aheavy_eos[ii]);
 	} */
-	rates_table.elec_rate_tab_eos[i] *= 1e-39 * INV_COCO_TIME; 
-        rates_table.elec_rate_single_eos[i] *= 1e-39 * INV_COCO_TIME;
         
-        rates_table.elec_rate_fast_eos[i] += electron_capture_proton(T, nb, degenerate_potential(M_ELECTRON, nb*Y_e), mu_nu, eta_nucl(T, n_p, n_n, mu_p-M_PROTON, mu_neut-M_NEUTRON));
+        //rates_table.elec_rate_fast_eos[i] += electron_capture_proton(T, nb, degenerate_potential(M_ELECTRON, nb*Y_e), mu_nu, eta_nucl(T, n_p, n_n, mu_p-M_PROTON, mu_neut-M_NEUTRON));
+
         rates_table.elec_rate_fast_eos[i] *= INV_COCO_TIME;
+	rates_table.elec_rate_tab_eos[i] *= INV_COCO_TIME; 
+        rates_table.elec_rate_single_eos[i] *= INV_COCO_TIME;
 
         ++processed;
         if(processed % 1000 == 0) printf("%d / %d\n", processed, rates_table.size());

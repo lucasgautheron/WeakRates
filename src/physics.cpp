@@ -95,7 +95,8 @@ double nucleus_scattering_cross_section(int A, int Z, double eta, double eps_neu
 
     sigma_scattering_nucleus *= s_ion;
 
-    sigma_scattering_nucleus *= eta > -40 ? 120 * gsl_sf_fermi_dirac_int (5,eta) / (6 * gsl_sf_fermi_dirac_int (3,eta)) : 20; // f5_over_f3
+    const double f5_over_f3 = eta > -40 ? 120 * gsl_sf_fermi_dirac_int (5,eta) / (6 * gsl_sf_fermi_dirac_int (3,eta)) : 20;
+    sigma_scattering_nucleus *= f5_over_f3; 
 
     return sigma_scattering_nucleus;
 }
@@ -173,7 +174,7 @@ double  elec_capt_proton_effective(double mu_e, double mu_nu, double t, double m
   delete [] x;
   delete [] w;
   rproton = rproton * c;
-  return rproton;
+  return 1e-39 * rproton;
 }
 
 
@@ -283,7 +284,7 @@ double  elec_capt_heavy_nuclei_effective(double mue, double mu_nu, double na, do
   delete [] x;
   delete [] w;
   rheavy = rheavy * c / aheavy;
-  return rheavy;
+  return 1e-39 * rheavy;
 }
 
 double eta_np_v3(double mun, double mup, double t)

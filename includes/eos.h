@@ -18,8 +18,8 @@ struct full_EOS_table;
 struct short_EOS_table : EOS_table
 {
     int p_mu;
-    double *mu_nu_eos, *elec_rate_tab_eos, *elec_rate_single_eos;
-    double *scattering_xs_eos, *elec_rate_fast_eos;
+    double *mu_nu_eos, *elec_rate_tab_eos, *elec_rate_single_eos, *elec_rate_fast_eos;
+    double *scattering_xs_nu_eos, *scattering_xs_nu_bar_eos, *scattering_xs_nu_x_eos;
 
     int read(const char *path, int type);
     int write(const char *path);
@@ -53,7 +53,9 @@ struct short_EOS_table : EOS_table
         elec_rate_tab_eos = new double[s];
         elec_rate_fast_eos = new double[s];
         elec_rate_single_eos = new double[s];
-        scattering_xs_eos = new double[s];
+        scattering_xs_nu_eos = new double[s];
+        scattering_xs_nu_bar_eos = new double[s];
+        scattering_xs_nu_x_eos = new double[s];
     }
 };
 
