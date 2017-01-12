@@ -7,6 +7,10 @@ int main(int argc, const char *argv[])
         std::cout << "Missing compose model! Can't run any further.\n";
         return 1;
     }
+  
+    
+    const char *compose_path = argv[1];
+    const char *custom_eos_table = argc >= 3 ? argv[2] : NULL;
 
     // read EOS table
     // read abundances
@@ -18,6 +22,13 @@ int main(int argc, const char *argv[])
     entries = read_nuclear_data("data/mass.mas12");
     std::cout << "Read " << entries << " nuclear data entries\n";
 
+    if(!custom_eos_table)
+    {
+        // Compile HDF5 from compose files
+        std::cout << "Compiling HDF5 from compose files " << argv[1] << "...\n";
+        compile_compose_data(argv[1]);
+    }
+
     // Read abundance data
     std::cout << "Reading compose data from " << argv[1] << "...\n";
     entries = read_abundance_data(argv[1]);
@@ -25,7 +36,8 @@ int main(int argc, const char *argv[])
 
     // Read full EOS data
     full_EOS_table full_table;
-    full_table.read("data/eosls220_low.h5", EOS_TYPE_LOW);
+    full_table.read(custom_eos_table ? custom_eos_table : "compose/", custom_eos_table ? EOS_TYPE_LOW : EOS_TYPE_COMPOSE);
+    // "data/eosls220_low.h5"
     //full_table.read("data/eoscompose.h5", EOS_TYPE_COMPOSE);
 
     // Read rate EOS data
