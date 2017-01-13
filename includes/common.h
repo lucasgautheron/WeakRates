@@ -8,6 +8,7 @@
 #include <algorithm>
 #include <iterator>
 #include <math.h>
+#include <string.h>
 
 #include <omp.h>
 

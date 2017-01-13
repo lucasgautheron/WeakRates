@@ -1,7 +1,7 @@
 #OPTIMIZATION=-ggdb -Og
-OPTIMIZATION=-Ofast -ffast-math -funroll-loops
+OPTIMIZATION=-Ofast
 
-CPPFLAGS=$(OPTIMIZATION) -Wall -std=c++0x -I./includes/ -I/usr/include/hdf5/serial/ -fopenmp
+CPPFLAGS=$(OPTIMIZATION) -Wall -std=c++0x -I./includes/ -I/usr/include/hdf5/serial/ -fopenmp -D DEBUG
 LDFLAGS=-g -Wall -Wextra -L/usr/lib/x86_64-linux-gnu/hdf5/serial
 LDLIBS=-lm -lgsl -lgslcblas -lhdf5 -lpthread -fopenmp
 

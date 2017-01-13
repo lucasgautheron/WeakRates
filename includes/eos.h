@@ -1,3 +1,5 @@
+#define ALLOC(arr, type, size) arr = new type[size]; memset(arr, 0, size*sizeof(type));
+
 enum { EOS_TYPE_LOW = 0, EOS_TYPE_COMPOSE };
 
 struct EOS_table
@@ -20,6 +22,9 @@ struct short_EOS_table : EOS_table
     int p_mu;
     double *mu_nu_eos, *elec_rate_tab_eos, *elec_rate_single_eos, *elec_rate_fast_eos;
     double *scattering_xs_nu_eos, *scattering_xs_nu_bar_eos, *scattering_xs_nu_x_eos;
+#ifdef DEBUG
+    double *scattering_xs_nu_sna_eos;
+#endif
 
     int read(const char *path, int type);
     int write(const char *path);
@@ -46,16 +51,19 @@ struct short_EOS_table : EOS_table
     void allocate()
     {
         int s = size();
-        ln_rho_eos = new double[m_ln_rho];
-        ln_t_eos = new double[n_ln_t];
-        y_e_eos = new double[o_y_e];
-        mu_nu_eos = new double[p_mu];
-        elec_rate_tab_eos = new double[s];
-        elec_rate_fast_eos = new double[s];
-        elec_rate_single_eos = new double[s];
-        scattering_xs_nu_eos = new double[s];
-        scattering_xs_nu_bar_eos = new double[s];
-        scattering_xs_nu_x_eos = new double[s];
+        ALLOC(ln_rho_eos, double, m_ln_rho);
+        ALLOC(ln_t_eos, double, n_ln_t);
+        ALLOC(y_e_eos, double, o_y_e);
+        ALLOC(mu_nu_eos, double, p_mu);
+        ALLOC(elec_rate_tab_eos, double, s);
+        ALLOC(elec_rate_fast_eos, double, s);
+        ALLOC(elec_rate_single_eos, double, s);
+        ALLOC(scattering_xs_nu_eos, double, s);
+        ALLOC(scattering_xs_nu_bar_eos, double, s);
+        ALLOC(scattering_xs_nu_x_eos, double, s);
+#ifdef DEBUG
+        ALLOC(scattering_xs_nu_sna_eos, double, s);
+#endif
     }
 };
 
@@ -90,28 +98,28 @@ struct full_EOS_table : EOS_table
     {
         int s = size();
 
-        ln_rho_eos = new double[m_ln_rho];
-        ln_t_eos = new double[n_ln_t];
-        y_e_eos = new double[o_y_e];
-        p_eos = new double[s];
-        e_eos = new double[s];
-        entropy_eos = new double[s];
-        dp_drho_eos = new double[s];
-        dp_deps_eos = new double[s];
-        c_sound_squared_newtonian_eos = new double[s];
-        mub_eos = new double[s];
-        muq_eos = new double[s];
-        mul_eos = new double[s];
-        xp_eos = new double[s];
-        xn_eos = new double[s];
-        xa_eos = new double[s];
-        xheavy_eos = new double[s];
-        aheavy_eos = new double[s];
-        zheavy_eos = new double[s];
-        eflg_eos = new int[s];
+        ALLOC(ln_rho_eos, double, m_ln_rho);
+        ALLOC(ln_t_eos, double, n_ln_t);
+        ALLOC(y_e_eos, double, o_y_e);
+        ALLOC(p_eos, double, s);
+        ALLOC(e_eos, double, s);
+        ALLOC(entropy_eos, double, s);
+        ALLOC(dp_drho_eos, double, s);
+        ALLOC(dp_deps_eos, double, s);
+        ALLOC(c_sound_squared_newtonian_eos, double, s);
+        ALLOC(mub_eos, double, s);
+        ALLOC(muq_eos, double, s);
+        ALLOC(mul_eos, double, s);
+        ALLOC(xp_eos, double, s);
+        ALLOC(xn_eos, double, s);
+        ALLOC(xa_eos, double, s);
+        ALLOC(xheavy_eos, double, s);
+        ALLOC(aheavy_eos, double, s);
+        ALLOC(zheavy_eos, double, s);
+        ALLOC(eflg_eos, int, s);
 
-        thermo_eos = new double[s * 8];
-        yi_eos = new double[s * 3];
+        ALLOC(thermo_eos, double, s * 8);
+        ALLOC(yi_eos, double, s * 3);
     }
 };
 

@@ -51,7 +51,7 @@ inline double gas_potential(double T, double density, double mass, const int g =
 
 inline double average_neutrino_energy(double T, double mu_nu)
 {
-    return mu_nu/T > -40 ? T*(6*gsl_sf_fermi_dirac_int (3,mu_nu/T)) / (2*gsl_sf_fermi_dirac_int (2,mu_nu/T)) : 3*T;
+    return mu_nu > -10*T ? T*(6*gsl_sf_fermi_dirac_int (3,mu_nu/T)) / (2*gsl_sf_fermi_dirac_int (2,mu_nu/T)) : 3*T;
 }
 
 inline double fermi_dirac(double E, double mu, double T)

@@ -404,6 +404,14 @@ int short_EOS_table::write(const char *path)
                           H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
   H5Dwrite(dataset, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, this->scattering_xs_nu_x_eos);
   H5Dclose (dataset);
+  
+#ifdef DEBUG
+    dataset = H5Dcreate2(file, "sigma_scattering_nuclei_nu_sna", H5T_NATIVE_DOUBLE, dataspace, 
+                          H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+  H5Dwrite(dataset, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, this->scattering_xs_nu_sna_eos);
+  H5Dclose (dataset);
+#endif
+  
   H5Sclose(dataspace);
 
   // close file

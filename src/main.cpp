@@ -2,6 +2,10 @@
 
 int main(int argc, const char *argv[])
 {
+#ifdef DEBUG
+    std::cout << "Debug mode enabled!\n";
+#endif
+    
     if(argc < 2)
     {
         std::cout << "Missing compose model! Can't run any further.\n";
@@ -117,16 +121,25 @@ int main(int argc, const char *argv[])
                 else n_p = abundance;
             }
             
-            if(A < 2 || Z < 2) continue;
+            if(A < 2 || Z < 2 || abundance <= 0) continue;
 
             total_abundance += abundance;
             
-            //rates_table.elec_rate_fast_eos[i] += abundance * electron_capture_fit(A, Z, T, degenerate_potential(M_ELECTRON, nb*Y_e));
+            // neutrino-nuclei scattering
+            
             rates_table.scattering_xs_nu_eos[i] += abundance * nucleus_scattering_cross_section(A, Z, eta, eps_mu, abundance*nb);
             rates_table.scattering_xs_nu_bar_eos[i] += abundance * nucleus_scattering_cross_section(A, Z, -eta, eps_mu_bar, abundance*nb);
             rates_table.scattering_xs_nu_x_eos[i] += abundance * nucleus_scattering_cross_section(A, Z, 0, 3.1513743717389 * T, abundance*nb);
+            
+            // electron capture rates 
+            
+            //rates_table.elec_rate_fast_eos[i] += abundance * electron_capture_fit(A, Z, T, degenerate_potential(M_ELECTRON, nb*Y_e));
             //rates_table.elec_rate_tab_eos[i] += elec_capt_heavy_nuclei_effective(mu_e, mu_nu_eff, abundance, T, mu_neut, mu_p, Z, A);
 	}
+
+#ifdef DEBUG
+        rates_table.scattering_xs_nu_sna_eos[i] = total_abundance*nucleus_scattering_cross_section(full_table.aheavy_eos[ii]+0.5, full_table.zheavy_eos[ii]+0.5, eta, eps_mu, total_abundance*nb);
+#endif
 
         //const double rb = elec_capt_proton_effective(mu_e, mu_nu_eff, T, mu_neut, mu_p, full_table.xp_eos[ii], full_table.xn_eos[ii], /*eta_pn*/eta_nucl(T, n_p, n_n, mu_p-M_PROTON, mu_neut-M_NEUTRON));
         //rates_table.elec_rate_tab_eos[i] += rb/nb;
