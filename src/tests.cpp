@@ -47,7 +47,7 @@ int main(int argc, const char *argv[])
     std::cout << "Read " << entries << " EOS entries\n";
     full_table.dump();
 
-    FILE *fp = fopen("output/compare.res", "w+");
+    FILE *fp_neutrinos = fopen("output/compare_neutrinos.res", "w+");
     for(int m = 0; m < rates_table.m_ln_rho; ++m)
     for(int n = 0; n < rates_table.n_ln_t; ++n)
     for(int o = 0; o < rates_table.o_y_e; ++o)
@@ -69,17 +69,44 @@ int main(int argc, const char *argv[])
         //const double eta_pn = eta_pn_v3(mu_neut, mu_p, T);
 
         double conditions[3] = {T, nb, Y_e};
+        
+        double total_abundance = 0;
+        std::vector<element> elements;
+        get_abundances(conditions, elements);
+        
+        double aheavy = 0, zheavy = 0;
+        for(int j = 0; j < elements.size(); ++j)
+	{
+            int A = elements[j].A, Z = elements[j].Z;
+	    double abundance = elements[j].abundance;
+
+            
+            if(A < 4 || Z < 2 || abundance <= 0) continue;
+            aheavy += A*abundance;
+            zheavy += Z*abundance;
+
+            total_abundance += abundance;
+            
+	}
+	if(total_abundance > 1e-30)
+        {
+            aheavy /= total_abundance;
+            zheavy /= total_abundance;
+        }
 
         double /*mu_e = degenerate_potential(M_ELECTRON, nb*Y_e),*/ eps_mu = average_neutrino_energy(T, mu_nu_eff);
 
         if(T > 0.01 && T < 5 && nb > 1e-8 && nb < 1e-2 && Y_e > 0.1)
-        fprintf(fp, "%e %e %.3f %e %e %e %e %e\n", T, nb, Y_e, mu_nu_eff, rates_table.elec_rate_tab_eos[i], output_table.elec_rate_fast_eos[i], output_table.elec_rate_tab_eos[i], output_table.scattering_xs_nu_eos[i]);
+        {
+        //fprintf(fp, "%e %e %.3f %e %e %e %e %e\n", T, nb, Y_e, mu_nu_eff, rates_table.elec_rate_tab_eos[i], output_table.elec_rate_fast_eos[i], output_table.elec_rate_tab_eos[i], output_table.scattering_xs_nu_eos[i]);
+            fprintf(fp_neutrinos, "%e %e %e %e %e %e %e %e %e %e\n", T, nb, Y_e, mu_nu_eff, aheavy, zheavy, full_table.aheavy_eos[ii], full_table.zheavy_eos[ii], output_table.scattering_xs_nu_eos[i], output_table.scattering_xs_nu_sna_eos[i]);
+        }
 
         //printf("%e %e %e\n", T, mu_e, degenerate_potential(M_ELECTRON, nb*Y_e));
         //continue;
 
     }
-    fclose(fp);
+    fclose(fp_neutrinos);
 
     return 0;
 }
