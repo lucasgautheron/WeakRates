@@ -73,9 +73,27 @@ int short_EOS_table::read(const char *path, int type)
   status = H5Dread (dataset, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, this->elec_rate_fast_eos);
   H5Dclose (dataset);
 
-dataset = H5Dopen (file, "elec_capt_single_rate");
+  dataset = H5Dopen (file, "elec_capt_single_rate");
   status = H5Dread (dataset, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, this->elec_rate_single_eos);
   H5Dclose (dataset);
+  
+  dataset = H5Dopen (file, "sigma_scattering_nuclei_nu");
+  status = H5Dread (dataset, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, this->scattering_xs_nu_eos);
+  H5Dclose (dataset);
+  
+  dataset = H5Dopen (file, "sigma_scattering_nuclei_nu_bar");
+  status = H5Dread (dataset, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, this->scattering_xs_nu_bar_eos);
+  H5Dclose (dataset);
+  
+  dataset = H5Dopen (file, "sigma_scattering_nuclei_nu_x");
+  status = H5Dread (dataset, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, this->scattering_xs_nu_x_eos);
+  H5Dclose (dataset);
+  
+#ifdef DEBUG
+  dataset = H5Dopen (file, "sigma_scattering_nuclei_nu_sna");
+  status = H5Dread (dataset, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, this->scattering_xs_nu_sna_eos);
+  H5Dclose (dataset);
+#endif
 
   // close file
   status = H5Fclose (file);

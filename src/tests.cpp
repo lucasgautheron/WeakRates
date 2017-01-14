@@ -47,7 +47,8 @@ int main(int argc, const char *argv[])
     std::cout << "Read " << entries << " EOS entries\n";
     full_table.dump();
 
-    FILE *fp_neutrinos = fopen("output/compare_neutrinos.res", "w+");
+    FILE *fp_scattering = fopen("output/compare_neutrinos.res", "w+");
+    FILE *fp_capture = fopen("output/compare_capture.res", "w+");
     for(int m = 0; m < rates_table.m_ln_rho; ++m)
     for(int n = 0; n < rates_table.n_ln_t; ++n)
     for(int o = 0; o < rates_table.o_y_e; ++o)
@@ -98,15 +99,16 @@ int main(int argc, const char *argv[])
 
         if(T > 0.01 && T < 5 && nb > 1e-8 && nb < 1e-2 && Y_e > 0.1)
         {
-        //fprintf(fp, "%e %e %.3f %e %e %e %e %e\n", T, nb, Y_e, mu_nu_eff, rates_table.elec_rate_tab_eos[i], output_table.elec_rate_fast_eos[i], output_table.elec_rate_tab_eos[i], output_table.scattering_xs_nu_eos[i]);
-            fprintf(fp_neutrinos, "%e %e %e %e %e %e %e %e %e %e\n", T, nb, Y_e, mu_nu_eff, aheavy, zheavy, full_table.aheavy_eos[ii], full_table.zheavy_eos[ii], output_table.scattering_xs_nu_eos[i], output_table.scattering_xs_nu_sna_eos[i]);
+            fprintf(fp_capture, "%e %e %.3f %e %e %e %e\n", T, nb, Y_e, mu_nu_eff, rates_table.elec_rate_tab_eos[i], output_table.elec_rate_fast_eos[i], output_table.elec_rate_tab_eos[i]);
+            fprintf(fp_scattering, "%e %e %e %e %e %e %e %e %e %e\n", T, nb, Y_e, mu_nu_eff, aheavy, zheavy, full_table.aheavy_eos[ii], full_table.zheavy_eos[ii], output_table.scattering_xs_nu_eos[i], output_table.scattering_xs_nu_sna_eos[i]);
         }
 
         //printf("%e %e %e\n", T, mu_e, degenerate_potential(M_ELECTRON, nb*Y_e));
         //continue;
 
     }
-    fclose(fp_neutrinos);
+    fclose(fp_scattering);
+    fclose(fp_capture);
 
     return 0;
 }
