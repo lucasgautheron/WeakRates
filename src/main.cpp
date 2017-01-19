@@ -109,6 +109,7 @@ int main(int argc, const char *argv[])
         double n_n = 0, n_p = 0;
         std::vector<element> elements;
         get_abundances(conditions, elements);
+        double aheavy = 0, zheavy = 0;
 
         for(int j = 0; j < elements.size(); ++j)
 	{
@@ -122,7 +123,9 @@ int main(int argc, const char *argv[])
             }
             
             if(A < 2 || Z < 2 || abundance <= 0) continue;
-
+            
+            aheavy += abundance * A;
+            zheavy += abundance * Z;
             total_abundance += abundance;
             
             // neutrino-nuclei scattering
@@ -136,9 +139,11 @@ int main(int argc, const char *argv[])
             rates_table.elec_rate_fast_eos[i] += abundance * electron_capture_fit(A, Z, T, degenerate_potential(M_ELECTRON, nb*Y_e));
             //rates_table.elec_rate_tab_eos[i] += elec_capt_heavy_nuclei_effective(mu_e, mu_nu_eff, abundance, T, mu_neut, mu_p, Z, A);
 	}
+	aheavy /= total_abundance;
+        zheavy /= total_abundance;
 
 #ifdef DEBUG
-        rates_table.scattering_xs_nu_sna_eos[i] = total_abundance*nucleus_scattering_cross_section(full_table.aheavy_eos[ii]+0.5, full_table.zheavy_eos[ii]+0.5, eta, eps_mu, total_abundance*nb);
+        if(total_abundance >= 1e-30) rates_table.scattering_xs_nu_sna_eos[i] = total_abundance*nucleus_scattering_cross_section(aheavy/*full_table.aheavy_eos[ii]+0.5*/, zheavy/*full_table.zheavy_eos[ii]+0.5*/, eta, eps_mu, total_abundance*nb);
 #endif
 
         //const double rb = elec_capt_proton_effective(mu_e, mu_nu_eff, T, mu_neut, mu_p, full_table.xp_eos[ii], full_table.xn_eos[ii], /*eta_pn*/eta_nucl(T, n_p, n_n, mu_p-M_PROTON, mu_neut-M_NEUTRON));
@@ -157,6 +162,8 @@ int main(int argc, const char *argv[])
         rates_table.elec_rate_fast_eos[i] *= INV_COCO_TIME;
 	rates_table.elec_rate_tab_eos[i] *= INV_COCO_TIME; 
         rates_table.elec_rate_single_eos[i] *= INV_COCO_TIME;
+        
+        rates_table.elec_rate_tab_eos[i] = rates_table.elec_rate_fast_eos[i];
 
         ++processed;
         if(processed % 1000 == 0) printf("%d / %d\n", processed, rates_table.size());
