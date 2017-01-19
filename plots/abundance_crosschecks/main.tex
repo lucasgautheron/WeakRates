@@ -1,13 +1,14 @@
 \documentclass{article}
-\usepackage{geometry}
+\usepackage[paperwidth=10cm,paperheight=8cm]{geometry}
 \usepackage{color}
+\usepackage{calc}
 \usepackage{graphicx}
+\pagenumbering{gobble}
 
 \begin{document}
 \begin{figure}
   \begin{center}
-    \include{plot}
+    \resizebox{!}{0.6\totalheight}{\input{plot.tex}}
   \end{center}
-  \caption{}
 \end{figure}
 \end{document}

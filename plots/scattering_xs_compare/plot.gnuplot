@@ -8,7 +8,7 @@ set xrange [1e-48:1e-38]
 set yrange [1e-48:1e-38]
 
 set xlabel '$\sigma_{scatt}$ SNA [ cm$^{-2}$ ]'
-set ylabel '$\sigma_{scatt}$ distribution [ cm$^{-2}$ ]'
+set ylabel '$\sigma_{scatt}$ nuclei-distribution [ cm$^{-2}$ ]'
 
 set pointsize 0.2
 
