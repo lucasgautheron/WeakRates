@@ -84,7 +84,7 @@ int read_abundance_data(const char *path)
             element e;
             iss >> e.nucleus;
             iss >> e.abundance;
-            if(!e.nucleus) printf("Warning: invalid pair in line %d\n", count);
+            if(!e.nucleus) { printf("Warning: invalid pair in line %d\n", count); break; }
 
             nucleus_to_AZ(e.nucleus, e.A, e.Z);
             ab->elements.push_back(e);
