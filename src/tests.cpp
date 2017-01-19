@@ -49,6 +49,7 @@ int main(int argc, const char *argv[])
 
     FILE *fp_scattering = fopen("output/compare_neutrinos.res", "w+");
     FILE *fp_capture = fopen("output/compare_capture.res", "w+");
+    FILE *fp_nuclei = fopen("output/compare_nuclei.res", "w+");
     for(int m = 0; m < rates_table.m_ln_rho; ++m)
     for(int n = 0; n < rates_table.n_ln_t; ++n)
     for(int o = 0; o < rates_table.o_y_e; ++o)
@@ -101,6 +102,7 @@ int main(int argc, const char *argv[])
         {
             fprintf(fp_capture, "%e %e %.3f %e %e %e %e\n", T, nb, Y_e, mu_nu_eff, rates_table.elec_rate_tab_eos[i], output_table.elec_rate_fast_eos[i], output_table.elec_rate_tab_eos[i]);
             fprintf(fp_scattering, "%e %e %e %e %e %e %e %e %e %e\n", T, nb, Y_e, mu_nu_eff, aheavy, zheavy, full_table.aheavy_eos[ii], full_table.zheavy_eos[ii], output_table.scattering_xs_nu_eos[i], output_table.scattering_xs_nu_sna_eos[i]);
+            fprintf(fp_nuclei, "%.3f %.3f %.3f %.3f %e %e %d\n", aheavy, zheavy, full_table.aheavy_eos[ii], full_table.zheavy_eos[ii], total_abundance, full_table.xheavy_eos[ii], elements.size());
         }
 
         //printf("%e %e %e\n", T, mu_e, degenerate_potential(M_ELECTRON, nb*Y_e));
@@ -109,6 +111,7 @@ int main(int argc, const char *argv[])
     }
     fclose(fp_scattering);
     fclose(fp_capture);
+    fclose(fp_nuclei);
 
     return 0;
 }

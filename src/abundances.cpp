@@ -60,6 +60,7 @@ int read_abundance_data(const char *path)
     
     int int_ph;
     int count = 0;
+    int Npairs = 0, Nquads = 0;
     std::string line;
     std::istringstream iss;
     while (std::getline(infile, line)) {
@@ -68,7 +69,7 @@ int read_abundance_data(const char *path)
         iss.str(line);
         for(int k = 0; k < 3; ++k) iss >> ab->idx[k];
         iss >> int_ph;
-        iss >> int_ph;
+        iss >> Npairs;
         iss >> int_ph;
         iss >> ab->nn;
         iss >> int_ph;
@@ -76,16 +77,22 @@ int read_abundance_data(const char *path)
 
         for(int k = 0; k < 3; ++k) ab->param[k] = table.parameters[k][ab->idx[k]];
 
-        while(true)
+        Npairs -= 2;
+        while(Npairs > 0)
         {
+            Npairs--;
             element e;
             iss >> e.nucleus;
             iss >> e.abundance;
-            if(!e.nucleus) break;
+            if(!e.nucleus) printf("Warning: invalid pair in line %d\n", count);
 
             nucleus_to_AZ(e.nucleus, e.A, e.Z);
             ab->elements.push_back(e);
         }
+        
+        iss >> Nquads;
+        if(Nquads > 0) printf("Warning: missing pairs or non-zero quads in line %d (%d)\n", count, Nquads);
+        
 
         element neutron, proton;
         neutron.A = 1;
