@@ -70,7 +70,11 @@ inline double eta_nucl(double T, double n1, double n2, double mu1, double mu2)
 double electron_capture_proton(double T, double nb, double mu_e, double mu_nu, double eta_pn);
 
 // Bruenn 1985 + Horowitz 1997
+#ifdef DEBUG
+double nucleus_scattering_cross_section(double A, double Z, double eta, double eps_neutrino, double density);
+#else
 double nucleus_scattering_cross_section(int A, int Z, double eta, double eps_neutrino, double density);
+#endif
 
 // Bruno Peres
 double  elec_capt_proton_effective(double mu_e, double mu_nu, double t, double muneut, double mup, double y_p, double y_n, double eta_pn);

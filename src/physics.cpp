@@ -69,7 +69,11 @@ double electron_capture_proton(double T, double nb, double mu_e, double mu_nu, d
 }
 
 // Bruenn 1985 + Horowitz 1997
+#ifdef DEBUG
+double nucleus_scattering_cross_section(double A, double Z, double eta, double eps_neutrino, double density)
+#else
 double nucleus_scattering_cross_section(int A, int Z, double eta, double eps_neutrino, double density)
+#endif
 {
     const double c_a = 0.5, c_v = 0.5 + 2.0 * 0.23119;
     density *= 1e39; // fm^{-3} -> cm^{-3}
