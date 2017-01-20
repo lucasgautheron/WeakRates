@@ -19,9 +19,15 @@ int main(int argc, const char *argv[])
     std::cout << "Read " << entries << " nuclear data entries\n";
     
     FILE *fp_nuclear = fopen("output/compare_qvalues.res", "w+");
+    int prev_A = 0;
     for(auto it = nuclear_table.begin(); it != nuclear_table.end(); it++) {
         fprintf(fp_nuclear, "%d %d %e %e %e %e\n", it->second->A, it->second->Z, it->second->m, SEMF(it->second->A, it->second->Z),
                 it->second->beta_q, SEMF(it->second->A, it->second->Z)-SEMF(it->second->A, it->second->Z+1));
+        if(prev_A != it->second->A)
+        {
+            fprintf(fp, "\n");
+            prev_A = it->second->A;
+        }
     }
     fclose(fp_nuclear);
 
