@@ -19,6 +19,9 @@ int read_nuclear_data(const char *path)
         //printf("%d %d %e %.3f\n", Z, A, m, beta_q);
         std::array<int, 2> elem = { A, Z };
         nuclear_table[elem] = new nuclear_data(A, Z, m, beta_q);
+#ifdef DEBUG
+        std::cout << "Nucleus (" << A << "," << Z << "), m = " << m << " MeV, betaQ = " << beta_q << "\n";
+#endif
         ++count;
     }
     return count;

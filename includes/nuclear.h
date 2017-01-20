@@ -32,9 +32,18 @@ inline double nucleus_mass(int A, int Z)
 inline double beta_decay_Q(int A, int Z)
 {
     std::array<int, 2> mother = { A, Z }, daughter = { A, Z-1 };
-    if(!nuclear_table.count(mother)) return nucleus_mass(A, Z)-nucleus_mass(A, Z-1);
-    if(abs(nuclear_table[mother]->beta_q) >= 0.0001) return nuclear_table[mother]->beta_q;
-    if(!nuclear_table.count(daughter)) return nucleus_mass(A, Z)-nucleus_mass(A, Z-1);
+    if(!nuclear_table.count(daughter))
+    {
+        return nucleus_mass(A, Z)-nucleus_mass(A, Z-1);
+    }
+    if(std::abs(nuclear_table[daughter]->beta_q) >= 0.0001)
+    {
+        return -nuclear_table[daughter]->beta_q;
+    }
+    if(!nuclear_table.count(mother))
+    {
+        return nucleus_mass(A, Z)-nucleus_mass(A, Z-1);
+    }
     return nuclear_table[mother]->m - nuclear_table[daughter]->m;
 }
 
