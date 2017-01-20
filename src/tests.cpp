@@ -25,7 +25,7 @@ int main(int argc, const char *argv[])
                 it->second->beta_q, SEMF(it->second->A, it->second->Z)-SEMF(it->second->A, it->second->Z+1));
         if(prev_A != it->second->A)
         {
-            fprintf(fp, "\n");
+            fprintf(fp_nuclear, "\n");
             prev_A = it->second->A;
         }
     }
