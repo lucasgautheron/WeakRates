@@ -17,6 +17,13 @@ int main(int argc, const char *argv[])
     // Read nuclear data (masses)
     entries = read_nuclear_data("data/mass.mas12");
     std::cout << "Read " << entries << " nuclear data entries\n";
+    
+    FILE *fp_nuclear = fopen("output/compare_qvalues.res", "w+");
+    for(auto it = nuclear_table.begin(); it != nuclear_table.end(); it++) {
+        fprintf(fp_nuclear, "%d %d %e %e %e %e\n", it->second->A, it->second->Z, it->second->m, SEMF(it->second->A, it->second->Z),
+                it->second->beta_q, SEMF(it->second->A, it->second->Z)-SEMF(it->second->A, it->second->Z+1));
+    }
+    fclose(fp_nuclear);
 
     // Read abundance data
     std::cout << "Reading compose data from " << argv[1] << "...\n";
@@ -100,7 +107,7 @@ int main(int argc, const char *argv[])
 
         if(T > 0.01 && T < 5 && nb > 1e-8 && nb < 1e-2 && Y_e > 0.1)
         {
-            fprintf(fp_capture, "%e %e %.3f %e %e %e %e\n", T, nb, Y_e, mu_nu_eff, rates_table.elec_rate_tab_eos[i], output_table.elec_rate_fast_eos[i], output_table.elec_rate_tab_eos[i]);
+            fprintf(fp_capture, "%e %e %.3f %e %e %e %e %.3f\n", T, nb, Y_e, mu_nu_eff, rates_table.elec_rate_tab_eos[i], output_table.elec_rate_fast_eos[i], output_table.elec_rate_tab_eos[i], (float)shell_capt_factor(aheavy, zheavy));
             fprintf(fp_scattering, "%e %e %e %e %e %e %e %e %e %e\n", T, nb, Y_e, mu_nu_eff, aheavy, zheavy, full_table.aheavy_eos[ii], full_table.zheavy_eos[ii], output_table.scattering_xs_nu_eos[i], output_table.scattering_xs_nu_sna_eos[i]);
             fprintf(fp_nuclei, "%.3f %.3f %.3f %.3f %e %e %d\n", aheavy, zheavy, full_table.aheavy_eos[ii], full_table.zheavy_eos[ii], total_abundance, full_table.xheavy_eos[ii], elements.size());
         }
