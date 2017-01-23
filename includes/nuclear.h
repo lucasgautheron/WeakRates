@@ -1,3 +1,7 @@
+#define mass_formula mass_dz33
+//#define mass_formula mass_dz10
+//#define mass_formula mass_SEMF
+
 struct nuclear_data
 {
     int A, Z;
@@ -44,30 +48,18 @@ inline double mass_dz33(int A, int Z)
     return Z*M_PROTON+(A-Z)*M_NEUTRON-B;
 }
 
-#define mass_formula mass_dz33
-
 inline double nucleus_mass(int A, int Z)
 {
     std::array<int, 2> elem = { A, Z };
-    return (nuclear_table.count(elem)) ? nuclear_table[elem]->m : mass_formula(A, Z);
+    if(nuclear_table.count(elem)) return nuclear_table[elem]->m;    
+    
+    nuclear_table[elem] = new nuclear_data(A, Z, mass_formula(A, Z), 0);
+    return nuclear_table[elem]->m;
 }
 
 inline double beta_decay_Q(int A, int Z)
 {
-    std::array<int, 2> mother = { A, Z }, daughter = { A, Z-1 };
-    if(!nuclear_table.count(daughter))
-    {
-        return nucleus_mass(A, Z)-nucleus_mass(A, Z-1);
-    }
-    /*if(std::abs(nuclear_table[daughter]->beta_q) >= 0.0001)
-    {
-        return -nuclear_table[daughter]->beta_q;
-    }*/
-    if(!nuclear_table.count(mother))
-    {
-        return nucleus_mass(A, Z)-nucleus_mass(A, Z-1);
-    }
-    return nuclear_table[mother]->m - nuclear_table[daughter]->m;
+    return nucleus_mass(A, Z) - nucleus_mass(A, Z-1);
 }
 
 int read_nuclear_data(const char *path);
