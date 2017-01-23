@@ -26,9 +26,13 @@ int main(int argc, const char *argv[])
             fprintf(fp_nuclear, "\n");
             prev_A = it->second->A;
         }
-        fprintf(fp_nuclear, "%d %d %e %e %e %e %e\n", it->second->A, it->second->Z, it->second->Z * M_PROTON + (it->second->A-it->second->Z)*M_NEUTRON,
-                it->second->m, SEMF(it->second->A, it->second->Z),
-                it->second->beta_q, SEMF(it->second->A, it->second->Z)-SEMF(it->second->A, it->second->Z+1));
+        std::array<int, 2> daughter = { it->second->A, it->second->Z+1 };
+        fprintf(fp_nuclear, "%d %d %e %e %e %e %e %e %e %e %e %e\n", it->second->A, it->second->Z, it->second->Z * M_PROTON + (it->second->A-it->second->Z)*M_NEUTRON,
+                it->second->m, mass_formula(it->second->A, it->second->Z), mass_dz10(it->second->A, it->second->Z), mass_SEMF(it->second->A, it->second->Z),
+                it->second->beta_q, nuclear_table.count(daughter) ? it->second->m - nuclear_table[daughter]->m : 0,
+                mass_formula(it->second->A, it->second->Z)-mass_formula(it->second->A, it->second->Z+1),
+                mass_dz10(it->second->A, it->second->Z)-mass_dz10(it->second->A, it->second->Z+1),
+                mass_SEMF(it->second->A, it->second->Z)-mass_SEMF(it->second->A, it->second->Z+1));
     }
     fclose(fp_nuclear);
 

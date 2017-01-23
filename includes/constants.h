@@ -2,7 +2,7 @@
 #define ATOMIC_RADIUS 1.25
 
 #define M_ELECTRON 0.511 // MeV
-#define M_PROTON 938.272
+#define M_PROTON 938.2720
 #define M_NEUTRON 939.5654
 #define MASS_UNIT 931.4940954
 
