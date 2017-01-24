@@ -1,7 +1,7 @@
 #include "common.h"
 
 // Fast electron capture simulation, using the parametrization by Langake, Martinez-Pinedo et al.
-double electron_capture_fit(int A, int Z, double T, double mu_e, double Q)
+double electron_capture_fit(int A, int Z, double T, double mu_e, double mu_nu, double Q)
 {
     // K [s]
     // Characteristic time associated with the capture rate.
@@ -24,7 +24,8 @@ double electron_capture_fit(int A, int Z, double T, double mu_e, double Q)
     double rate = 0.693 * beta/K * pow(T/M_ELECTRON, 5.);
     
     // gsl fermi integrals include a normalization factor 1/Gamma(j) hence the multiplication by (j-1)!
-    rate *= 24*gsl_sf_fermi_dirac_int (4,eta) - 2 * chi * 6*gsl_sf_fermi_dirac_int (3,eta) + chi*chi * 2*gsl_sf_fermi_dirac_int (2, eta);
+    //rate *= 24*gsl_sf_fermi_dirac_int (4,eta) - 2 * chi * 6*gsl_sf_fermi_dirac_int (3,eta) + chi*chi * 2*gsl_sf_fermi_dirac_int (2, eta);
+    rate *= electron_capture_ps(T, mu_e, mu_nu, Q);
 
     return rate;
 }
@@ -45,7 +46,7 @@ double electron_capture_proton_int(double x, void *params)
            Q = ((double *)params)[2],
            T = ((double *)params)[3];
 
-    return x*x*(x+Q)*(x+Q)*fermi_dirac_dimless(x+Q, m_e)*(1-fermi_dirac_dimless(x, m_nu))*sqrt(1-M_ELECTRON/((x+Q)*T)*M_ELECTRON/((x+Q)*T));
+    return x*x*(x+Q)*(x+Q)*fermi_dirac_dimless(x+Q, m_e)*(1-fermi_dirac_dimless(x, m_nu))*sqrt(1-SQUARE(M_ELECTRON/((x+Q)*T)));
 }
 
 
@@ -65,21 +66,27 @@ double electron_capture_proton_int(double x, void *params)
 
 // Integration
 
-gsl_integration_workspace *gsl_workspace;
+int gsl_errors = 0;
+gsl_integration_workspace **gsl_workspaces;
 gsl_function electron_capture_ps_func,
              electron_capture_proton_func;
              
 void gsl_error_handler(const char * reason, const char * file, int line, int gsl_errno)
 {
-    printf("GSL error %d: %s in %s:%d\n", gsl_errno, reason, file, line);
+    //printf("GSL error %d: %s in %s:%d (thread %d)\n", gsl_errno, reason, file, line, omp_get_thread_num());
+    ++gsl_errors;
 }
 
 int gsl_init()
 {
-    gsl_workspace = gsl_integration_workspace_alloc(1000);
+    gsl_workspaces = new gsl_integration_workspace*[omp_get_max_threads()];
+    for(int i = 0; i < omp_get_max_threads(); ++i) gsl_workspaces[i] = gsl_integration_workspace_alloc(1000);
+    
     electron_capture_ps_func.function = &electron_capture_ps_int;
     electron_capture_proton_func.function = &electron_capture_proton_int;
     gsl_set_error_handler (&gsl_error_handler);
+    
+    return 0;
 }
 
 double electron_capture_ps(double T, double mu_e, double mu_nu, double Q)
@@ -93,7 +100,7 @@ double electron_capture_ps(double T, double mu_e, double mu_nu, double Q)
   
     electron_capture_ps_func.params = (void *)params;
     gsl_integration_qagiu (&electron_capture_ps_func, lower_limit,
-        abs_error, rel_error, 1000, gsl_workspace, &result,
+        abs_error, rel_error, 1000, gsl_workspaces[omp_get_thread_num()], &result,
         &error);
     return result;
 }
@@ -121,15 +128,17 @@ double electron_capture_proton(double T, double nb, double mu_e, double mu_nu, d
     double params[4] = { mu_e/T, mu_nu/T, Q/T, T };
     double lower_limit = 0.001+max(0, M_ELECTRON-Q)/T,
            upper_limit = lower_limit + 100;	/* start integral from 1 (to infinity) */
-    double abs_error = 1.0e-6;	/* to avoid round-off problems */
-    double rel_error = 1.0e-6;	/* the result will usually be much better */
+    double abs_error = 1.0e-7;	/* to avoid round-off problems */
+    double rel_error = 1.0e-7;	/* the result will usually be much better */
     double result;		/* the result from the integration */
     double error;
   
+    gsl_integration_workspace *gsl_workspace = gsl_integration_workspace_alloc(1000);
     electron_capture_proton_func.params = (void *)params;
     gsl_integration_qagiu (&electron_capture_proton_func, lower_limit,
-        abs_error, rel_error, 1000, gsl_workspace, &result,
+        abs_error, rel_error, 1000, gsl_workspaces[omp_get_thread_num()]/*gsl_workspace*/, &result,
         &error);
+    gsl_integration_workspace_free(gsl_workspace);
     /*gsl_integration_qags (&electron_capture_proton_func, lower_limit, upper_limit,
         abs_error, rel_error, 1000, gsl_workspace, &result,
         &error);*/

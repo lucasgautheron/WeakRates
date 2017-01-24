@@ -75,7 +75,7 @@ int main(int argc, const char *argv[])
 
     int processed = 0;
     // poor man's multithreading
-    //#pragma omp parallel for
+    #pragma omp parallel for
     for(int m = 0; m < rates_table.m_ln_rho; ++m)
     for(int n = 0; n < rates_table.n_ln_t; ++n)
     for(int o = 0; o < rates_table.o_y_e; ++o)
@@ -138,7 +138,7 @@ int main(int argc, const char *argv[])
             
             // electron capture rates 
             
-            rates_table.elec_rate_fast_eos[i] += abundance * electron_capture_fit(A, Z, T, mu_e);
+            rates_table.elec_rate_fast_eos[i] += abundance * electron_capture_fit(A, Z, T, mu_e, mu_nu_eff);
             //rates_table.elec_rate_tab_eos[i] += elec_capt_heavy_nuclei_effective(mu_e, mu_nu_eff, abundance, T, mu_neut, mu_p, Z, A);
 	}
 	aheavy /= total_abundance;
@@ -168,9 +168,10 @@ int main(int argc, const char *argv[])
         rates_table.elec_rate_tab_eos[i] = rates_table.elec_rate_fast_eos[i];
 
         ++processed;
-        if(processed % 1000 == 0) printf("%d / %d\n", processed, rates_table.size());
+        if(processed % 1000 == 0) printf("%d / %d (%d)\n", processed, rates_table.size(), gsl_errors);
     }
 
+    printf("gsl_errors: %d\n", gsl_errors);
     rates_table.write("output/sigma_scattering_rate.h5");
 
     return 0;

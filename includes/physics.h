@@ -3,7 +3,8 @@
 
 double electron_capture_ps_int(double x, void *params);
 
-extern gsl_integration_workspace *gsl_workspace;
+extern int gsl_errors;
+extern gsl_integration_workspace **gsl_workspaces;
 extern gsl_function electron_capture_ps_func,
                     electron_capture_proton_func;
 
@@ -25,7 +26,7 @@ inline double fermi_dirac(double E, double mu, double T)
 }
 
 // fast electron capture simulation, using the parametrization by Langake
-double electron_capture_fit(int A, int Z, double T, double mu_e = M_ELECTRON, double Q = 1e10);
+double electron_capture_fit(int A, int Z, double T, double mu_e = M_ELECTRON, double mu_nu = 0, double Q = 1e10);
 
 // phase space factor for electron capture
 double electron_capture_ps(double T, double mu_e, double mu_nu, double Q);
