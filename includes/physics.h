@@ -1,9 +1,22 @@
 #define SQUARE(x) ((x)*(x))
 #define CUBIC(x) ((x)*(x)*(x))
 
+double electron_capture_ps_int(double x, void *params);
+
+extern gsl_integration_workspace *gsl_workspace;
+extern gsl_function electron_capture_ps_func,
+                    electron_capture_proton_func;
+
+int gsl_init();
+
 inline double average_neutrino_energy(double T, double mu_nu)
 {
     return mu_nu > -10*T ? T*(6*gsl_sf_fermi_dirac_int (3,mu_nu/T)) / (2*gsl_sf_fermi_dirac_int (2,mu_nu/T)) : 3*T;
+}
+
+inline double fermi_dirac_dimless(double E, double mu)
+{
+    return 1./(exp(E-mu)+1);
 }
 
 inline double fermi_dirac(double E, double mu, double T)
@@ -13,6 +26,9 @@ inline double fermi_dirac(double E, double mu, double T)
 
 // fast electron capture simulation, using the parametrization by Langake
 double electron_capture_fit(int A, int Z, double T, double mu_e = M_ELECTRON, double Q = 1e10);
+
+// phase space factor for electron capture
+double electron_capture_ps(double T, double mu_e, double mu_nu, double Q);
 
 // Bruenn 1985
 inline double eta_nucl(double T, double n1, double n2, double mu1, double mu2)

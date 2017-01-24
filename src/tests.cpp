@@ -7,6 +7,8 @@ int main(int argc, const char *argv[])
         std::cout << "Missing compose model! Can't run any further.\n";
         return 1;
     }
+    
+    gsl_init();
 
     // read EOS table
     // read abundances
@@ -17,6 +19,8 @@ int main(int argc, const char *argv[])
     // Read nuclear data (masses)
     entries = read_nuclear_data("data/mass.mas12");
     std::cout << "Read " << entries << " nuclear data entries\n";
+    
+    std::cout << "Computing Q values...\n";
     
     FILE *fp_nuclear = fopen("output/compare_qvalues.res", "w+");
     int prev_A = 1;
@@ -35,6 +39,18 @@ int main(int argc, const char *argv[])
                 mass_SEMF(it->second->A, it->second->Z)-mass_SEMF(it->second->A, it->second->Z+1));
     }
     fclose(fp_nuclear);
+    
+    std::cout << "Computing test integrals...\n";
+    
+    FILE *fp_integrals =  fopen("output/compare_integrals.res", "w+");
+    for(int i = 0; i < 50; ++i) for(int j = 0; j < 50; ++j) for(int k = 0; k < 50; ++k)
+    {
+        double mu_e = 2*double(i)/double(50), mu_nu = 2*double(j)/double(50), Q = -5+10*double(k)/50.;
+        double rate = 24*gsl_sf_fermi_dirac_int (4,Q+mu_e) - 2 * Q * 6*gsl_sf_fermi_dirac_int (3,Q+mu_e) + Q*Q * 2*gsl_sf_fermi_dirac_int (2, Q+mu_e);
+    
+        fprintf(fp_integrals, "%.3f %.3f %.3f %e %e\n", mu_e, mu_nu, Q, electron_capture_ps(1., mu_e, mu_nu, Q), rate);
+    }
+    fclose(fp_integrals);
 
     // Read abundance data
     std::cout << "Reading compose data from " << argv[1] << "...\n";
@@ -64,6 +80,7 @@ int main(int argc, const char *argv[])
     entries = full_table.size();
     std::cout << "Read " << entries << " EOS entries\n";
     full_table.dump();
+    
 
     FILE *fp_scattering = fopen("output/compare_neutrinos.res", "w+");
     FILE *fp_capture = fopen("output/compare_capture.res", "w+");
@@ -118,8 +135,8 @@ int main(int argc, const char *argv[])
 
         if(T > 0.01 && T < 5 && nb > 1e-8 && nb < 1e-2 && Y_e > 0.1)
         {
-            fprintf(fp_capture, "%e %e %.3f %e %e %e %e %.3f\n", T, nb, Y_e, mu_nu_eff, rates_table.elec_rate_tab_eos[i], output_table.elec_rate_fast_eos[i], output_table.elec_rate_tab_eos[i], (float)shell_capt_factor(aheavy, zheavy));
-            fprintf(fp_scattering, "%e %e %e %e %e %e %e %e %e %e\n", T, nb, Y_e, mu_nu_eff, aheavy, zheavy, full_table.aheavy_eos[ii], full_table.zheavy_eos[ii], output_table.scattering_xs_nu_eos[i], output_table.scattering_xs_nu_sna_eos[i]);
+            fprintf(fp_capture, "%.3f %e %.3f %e %e %e %e %.3f\n", T, nb, Y_e, mu_nu_eff, rates_table.elec_rate_tab_eos[i], output_table.elec_rate_fast_eos[i], output_table.elec_rate_tab_eos[i], (float)shell_capt_factor(aheavy, zheavy));
+            fprintf(fp_scattering, "%.3f %e %.3f %e %e %e %e %e %e %e\n", T, nb, Y_e, mu_nu_eff, aheavy, zheavy, full_table.aheavy_eos[ii], full_table.zheavy_eos[ii], output_table.scattering_xs_nu_eos[i], output_table.scattering_xs_nu_sna_eos[i]);
             fprintf(fp_nuclei, "%.3f %.3f %.3f %.3f %e %e %d\n", aheavy, zheavy, full_table.aheavy_eos[ii], full_table.zheavy_eos[ii], total_abundance, full_table.xheavy_eos[ii], elements.size());
         }
 

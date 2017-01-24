@@ -12,9 +12,11 @@
 
 #include <omp.h>
 
+#include <gsl/gsl_errno.h>
 #include <gsl/gsl_sf_fermi_dirac.h>
 #include <gsl/gsl_sf_gamma.h>
 #include <gsl/gsl_sf_result.h>
+#include <gsl/gsl_integration.h>
 
 #define H5_USE_16_API
 #include "hdf5.h"

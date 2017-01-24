@@ -29,7 +29,27 @@ double electron_capture_fit(int A, int Z, double T, double mu_e, double Q)
     return rate;
 }
 
-double electron_capture_ps(double T, double mu_e, double mu_nu, double Q)
+double electron_capture_ps_int(double x, void *params)
+{
+    double m_e = ((double *)params)[0],
+           m_nu = ((double *)params)[1],
+           Q = ((double *)params)[2];
+
+    return x*x*(x-Q)*(x-Q)*fermi_dirac_dimless(x-Q, m_e)*(1-fermi_dirac_dimless(x, m_nu));
+}
+
+double electron_capture_proton_int(double x, void *params)
+{
+    double m_e = ((double *)params)[0],
+           m_nu = ((double *)params)[1],
+           Q = ((double *)params)[2],
+           T = ((double *)params)[3];
+
+    return x*x*(x+Q)*(x+Q)*fermi_dirac_dimless(x+Q, m_e)*(1-fermi_dirac_dimless(x, m_nu))*sqrt(1-M_ELECTRON/((x+Q)*T)*M_ELECTRON/((x+Q)*T));
+}
+
+
+/*double electron_capture_ps(double T, double mu_e, double mu_nu, double Q)
 {
     double integral = 0;
     const int N = 256;
@@ -41,7 +61,41 @@ double electron_capture_ps(double T, double mu_e, double mu_nu, double Q)
         integral += E * E * (1-fermi_dirac(E, mu_nu, T)) * fermi_dirac(E+Q, mu_e, T) * (E+Q)*(E+Q) * dE;
     }
     return integral;
+}*/
 
+// Integration
+
+gsl_integration_workspace *gsl_workspace;
+gsl_function electron_capture_ps_func,
+             electron_capture_proton_func;
+             
+void gsl_error_handler(const char * reason, const char * file, int line, int gsl_errno)
+{
+    printf("GSL error %d: %s in %s:%d\n", gsl_errno, reason, file, line);
+}
+
+int gsl_init()
+{
+    gsl_workspace = gsl_integration_workspace_alloc(1000);
+    electron_capture_ps_func.function = &electron_capture_ps_int;
+    electron_capture_proton_func.function = &electron_capture_proton_int;
+    gsl_set_error_handler (&gsl_error_handler);
+}
+
+double electron_capture_ps(double T, double mu_e, double mu_nu, double Q)
+{
+    double params[3] = { mu_e/T, mu_nu/T, Q/T };
+    double lower_limit = 0; //max(params[2], M_ELECTRON);	/* start integral from 1 (to infinity) */
+    double abs_error = 1.0e-8;	/* to avoid round-off problems */
+    double rel_error = 1.0e-8;	/* the result will usually be much better */
+    double result;		/* the result from the integration */
+    double error;
+  
+    electron_capture_ps_func.params = (void *)params;
+    gsl_integration_qagiu (&electron_capture_ps_func, lower_limit,
+        abs_error, rel_error, 1000, gsl_workspace, &result,
+        &error);
+    return result;
 }
 
 // Bruenn 1985
@@ -54,7 +108,7 @@ double electron_capture_proton(double T, double nb, double mu_e, double mu_nu, d
     double rate = 4*CELERITY_FM * (gV*gV+3*gA*gA) * Vud*Vud * pow(2*M_PI, -3.) * FERMI_COUPLING*FERMI_COUPLING;
     rate *= eta_pn;
     
-    double integral = 0;
+    /*double integral = 0;
     const int N = 256;
     double Emin = max(0, M_ELECTRON-Q), Emax = 30*T;
     const double dE = (Emax-Emin)/double(N);
@@ -63,9 +117,24 @@ double electron_capture_proton(double T, double nb, double mu_e, double mu_nu, d
         const double E = Emin + (Emax-Emin)*(double(i)+0.5)/double(N);
         integral += E * E * (1-fermi_dirac(E, mu_nu, T)) * fermi_dirac(E+Q, mu_e, T) * (E+Q)*(E+Q) * sqrt(1-(M_ELECTRON/(E+Q))*(M_ELECTRON/(E+Q))) * dE;
     }
-    rate *= integral;
+    rate *= integral;*/
+    double params[4] = { mu_e/T, mu_nu/T, Q/T, T };
+    double lower_limit = 0.001+max(0, M_ELECTRON-Q)/T,
+           upper_limit = lower_limit + 100;	/* start integral from 1 (to infinity) */
+    double abs_error = 1.0e-6;	/* to avoid round-off problems */
+    double rel_error = 1.0e-6;	/* the result will usually be much better */
+    double result;		/* the result from the integration */
+    double error;
+  
+    electron_capture_proton_func.params = (void *)params;
+    gsl_integration_qagiu (&electron_capture_proton_func, lower_limit,
+        abs_error, rel_error, 1000, gsl_workspace, &result,
+        &error);
+    /*gsl_integration_qags (&electron_capture_proton_func, lower_limit, upper_limit,
+        abs_error, rel_error, 1000, gsl_workspace, &result,
+        &error);*/
 
-    return rate;
+    return rate * result;
 }
 
 // Bruenn 1985 + Horowitz 1997
