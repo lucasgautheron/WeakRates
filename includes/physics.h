@@ -1,7 +1,7 @@
 #define SQUARE(x) ((x)*(x))
 #define CUBIC(x) ((x)*(x)*(x))
 
-double electron_capture_ps_int(double x, void *params);
+#define GSL_INT_WP_SIZE 2048
 
 extern int gsl_errors;
 extern gsl_integration_workspace **gsl_workspaces;

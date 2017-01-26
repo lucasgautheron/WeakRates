@@ -43,9 +43,9 @@ int main(int argc, const char *argv[])
     std::cout << "Computing test integrals...\n";
     
     FILE *fp_integrals =  fopen("output/compare_integrals.res", "w+");
-    for(int i = 0; i < 50; ++i) for(int j = 0; j < 50; ++j) for(int k = 0; k < 50; ++k)
+    for(int i = 0; i < 100; ++i) for(int j = 0; j < 100; ++j) for(int k = 0; k < 50; ++k)
     {
-        double mu_e = 2*double(i)/double(50), mu_nu = 2*double(j)/double(50), Q = -5+10*double(k)/50.;
+        double mu_e = 10*double(i)/double(100), mu_nu = 100*double(j)/double(100), Q = -5+10*double(k)/50.;
         double rate = 24*gsl_sf_fermi_dirac_int (4,Q+mu_e) - 2 * Q * 6*gsl_sf_fermi_dirac_int (3,Q+mu_e) + Q*Q * 2*gsl_sf_fermi_dirac_int (2, Q+mu_e);
     
         fprintf(fp_integrals, "%.3f %.3f %.3f %e %e\n", mu_e, mu_nu, Q, electron_capture_ps(1., mu_e, mu_nu, Q), rate);

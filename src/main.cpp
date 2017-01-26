@@ -75,7 +75,7 @@ int main(int argc, const char *argv[])
 
     int processed = 0;
     // poor man's multithreading
-    #pragma omp parallel for
+    #pragma omp parallel for schedule(dynamic, 4) collapse(4)
     for(int m = 0; m < rates_table.m_ln_rho; ++m)
     for(int n = 0; n < rates_table.n_ln_t; ++n)
     for(int o = 0; o < rates_table.o_y_e; ++o)
