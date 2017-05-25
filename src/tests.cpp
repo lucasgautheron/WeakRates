@@ -1,7 +1,8 @@
 #include "common.h"
 
-#include "TH1.h"
+#include "TH3F.h"
 #include "TCanvas.h"
+#include "TFile.h"
 
 int main(int argc, const char *argv[])
 {
@@ -25,6 +26,20 @@ int main(int argc, const char *argv[])
     
     std::cout << "Computing Q values...\n";
     
+    TCanvas *c = new TCanvas("c","data",200, 10, 700, 500);
+    TFile *rootfile = new TFile("ouput/histograms.root","RECREATE");
+
+    #define new_ps_histo new TH3F("full_hist", "full_hist", \
+                                    100, -10, 5, \
+                                    100, -2, 6, \
+                                    100, 0, 1)
+
+    TH3F *full_histogram = new_ps_histo;
+    TH3F *restrict_histogram = new_ps_histo;
+    
+    #undef new_ps_histo
+
+
     FILE *fp_nuclear = fopen("output/compare_qvalues.res", "w+");
     int prev_A = 1;
     for(auto it = nuclear_table.begin(); it != nuclear_table.end(); it++) {
@@ -139,21 +154,29 @@ int main(int argc, const char *argv[])
 
         if(T > 0.01 && T < 5 && nb > 1e-8 && nb < 1e-2 && Y_e > 0.1)
         {
+            full_histogram->Fill(log(nb), log(T), Y_e);
             fprintf(fp_capture, "%.3f %e %.3f %e %e %e %e %.3f\n", T, nb, Y_e, mu_nu_eff, rates_table.elec_rate_tab_eos[i], output_table.elec_rate_fast_eos[i], output_table.elec_rate_tab_eos[i], (float)shell_capt_factor(aheavy, zheavy));
             fprintf(fp_scattering, "%.3f %e %.3f %e %e %e %e %e %e %e\n", T, nb, Y_e, mu_nu_eff, aheavy, zheavy, full_table.aheavy_eos[ii], full_table.zheavy_eos[ii], output_table.scattering_xs_nu_eos[i], output_table.scattering_xs_nu_sna_eos[i]);
             fprintf(fp_nuclei, "%.3f %.3f %.3f %.3f %e %e %d\n", aheavy, zheavy, full_table.aheavy_eos[ii], full_table.zheavy_eos[ii], total_abundance, full_table.xheavy_eos[ii], elements.size());
 
-            if(fabs(log(output_table.elec_rate_fast_eos[i]/rates_table.elec_rate_tab_eos[i])) > 2) fprintf(fp_debug, "%.3f %e %.3f %e %e %e %e %.3f %.3f %.3f %.3f %.3f\n", T, nb, Y_e, mu_nu_eff, rates_table.elec_rate_tab_eos[i], output_table.elec_rate_fast_eos[i], output_table.elec_rate_tab_eos[i], (float)shell_capt_factor(aheavy, zheavy), aheavy, zheavy, full_table.aheavy_eos[ii], full_table.zheavy_eos[ii]);
+            if(fabs(log(output_table.elec_rate_fast_eos[i]/rates_table.elec_rate_tab_eos[i])) > 2)
+            {
+                restrict_histogram->Fill(log(nb), log(T), Y_e);
+                fprintf(fp_debug, "%.3f %e %.3f %e %e %e %e %.3f %.3f %.3f %.3f %.3f\n", T, nb, Y_e, mu_nu_eff, rates_table.elec_rate_tab_eos[i], output_table.elec_rate_fast_eos[i], output_table.elec_rate_tab_eos[i], (float)shell_capt_factor(aheavy, zheavy), aheavy, zheavy, full_table.aheavy_eos[ii], full_table.zheavy_eos[ii]);
+            }
         }
 
         //printf("%e %e %e\n", T, mu_e, degenerate_potential(M_ELECTRON, nb*Y_e));
         //continue;
 
     }
+    full_histogram->Write();
+    restrict_histogram->Write();
     fclose(fp_scattering);
     fclose(fp_capture);
     fclose(fp_nuclei);
     fclose(fp_debug);
+        
 
     return 0;
 }
