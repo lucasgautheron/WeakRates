@@ -166,8 +166,8 @@ int main(int argc, const char *argv[])
 
             if(fabs(log(output_table.elec_rate_fast_eos[i]/rates_table.elec_rate_tab_eos[i])) > 2)
             {
-                restrict_histogram->Fill(log(nb), log(T), Y_e);
-                //fprintf(fp_debug, "%.3f %e %.3f %e %e %e %e %.3f %.3f %.3f %.3f %.3f\n", T, nb, Y_e, mu_nu_eff, rates_table.elec_rate_tab_eos[i], output_table.elec_rate_fast_eos[i], output_table.elec_rate_tab_eos[i], (float)shell_capt_factor(aheavy, zheavy), aheavy, zheavy, full_table.aheavy_eos[ii], full_table.zheavy_eos[ii]);
+                //restrict_histogram->Fill(log(nb), log(T), Y_e);
+                //fprintf(fp_debug, "%.3f %e %.3f %e %e %e %e %.3f %.3f %.3f %.3f %.3f\n", T, nb, Y_e, mu_nu_eff, rates_table.elec_rate_tab_eos[i], output_table.elec//_rate_fast_eos[i], output_table.elec_rate_tab_eos[i], (float)shell_capt_factor(aheavy, zheavy), aheavy, zheavy, full_table.aheavy_eos[ii], full_table.zheavy_eos[ii]);
             }
         }
 
