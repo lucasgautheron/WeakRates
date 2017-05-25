@@ -10,9 +10,16 @@ addons:
      - libgsl0-dev
      - build-essential
 
+before_install:
+ - mkdir -p $HOME/bin
+ - wget https://github.com/git-lfs/git-lfs/releases/download/v2.1.1/git-lfs-linux-amd64-2.1.1.tar.gz
+ - tar xvfz git-lfs-linux-amd64-2.1.1.tar.gz
+ - mv git-lfs-2.2.1/git-lfs $PWD/bin/git-lfs
+ - export PATH="$PWD/bin/:$PATH"
+
 install: ./install.sh
 
-before_script: git lfs pull
+before_script: git-lfs pull
 
 script: ./run data/eos/1 data/eosls220_low.h5 --test 3353 523079
 
