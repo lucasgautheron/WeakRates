@@ -114,9 +114,9 @@ int main(int argc, const char *argv[])
         double aheavy = 0, zheavy = 0;
 
         for(int j = 0; j < elements.size(); ++j)
-	{
+        {
             int A = elements[j].A, Z = elements[j].Z;
-	    double abundance = elements[j].abundance;
+            double abundance = elements[j].abundance;
 
             if(A == 1)
             {
@@ -140,8 +140,8 @@ int main(int argc, const char *argv[])
             
             rates_table.elec_rate_fast_eos[i] += abundance * electron_capture_fit(A, Z, T, mu_e, mu_nu_eff);
             //rates_table.elec_rate_tab_eos[i] += elec_capt_heavy_nuclei_effective(mu_e, mu_nu_eff, abundance, T, mu_neut, mu_p, Z, A);
-	}
-	aheavy /= total_abundance;
+        }
+        aheavy /= total_abundance;
         zheavy /= total_abundance;
 
 #ifdef DEBUG
@@ -162,7 +162,7 @@ int main(int argc, const char *argv[])
         rates_table.elec_rate_fast_eos[i] += electron_capture_proton(T, nb, mu_e, mu_nu, eta_nucl(T, n_p, n_n, mu_p-M_PROTON, mu_neut-M_NEUTRON));
 
         rates_table.elec_rate_fast_eos[i] *= INV_COCO_TIME;
-	rates_table.elec_rate_tab_eos[i] *= INV_COCO_TIME; 
+        rates_table.elec_rate_tab_eos[i] *= INV_COCO_TIME; 
         rates_table.elec_rate_single_eos[i] *= INV_COCO_TIME;
         
         rates_table.elec_rate_tab_eos[i] = rates_table.elec_rate_fast_eos[i];
