@@ -1,5 +1,8 @@
 #include "common.h"
 
+#include "TH1.h"
+#include "TCanvas.h"
+
 int main(int argc, const char *argv[])
 {
     if(argc < 2)
