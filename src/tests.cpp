@@ -30,8 +30,8 @@ int main(int argc, const char *argv[])
     TFile *rootfile = new TFile("output/histograms.root","RECREATE");
 
     #define new_ps_histo(name) new TH3F(name, name, \
-                                    100, -10, 5, \
-                                    100, -2, 6, \
+                                    100, -20, 10, \
+                                    100, -4, 8, \
                                     100, 0, 1)
 
     TH3F *full_histogram = new_ps_histo("full_hist");
@@ -153,9 +153,13 @@ int main(int argc, const char *argv[])
 
         double /*mu_e = degenerate_potential(M_ELECTRON, nb*Y_e),*/ eps_mu = average_neutrino_energy(T, mu_nu_eff);
 
+        full_histogram->Fill(log(nb), log(T), Y_e);
+        if(fabs(log(output_table.elec_rate_fast_eos[i]/rates_table.elec_rate_tab_eos[i])) > 2)
+            restrict_histogram->Fill(log(nb), log(T), Y_e);
+
         if(T > 0.01 && T < 5 && nb > 1e-8 && nb < 1e-2 && Y_e > 0.1)
         {
-            full_histogram->Fill(log(nb), log(T), Y_e);
+            
             //fprintf(fp_capture, "%.3f %e %.3f %e %e %e %e %.3f\n", T, nb, Y_e, mu_nu_eff, rates_table.elec_rate_tab_eos[i], output_table.elec_rate_fast_eos[i], output_table.elec_rate_tab_eos[i], (float)shell_capt_factor(aheavy, zheavy));
             //fprintf(fp_scattering, "%.3f %e %.3f %e %e %e %e %e %e %e\n", T, nb, Y_e, mu_nu_eff, aheavy, zheavy, full_table.aheavy_eos[ii], full_table.zheavy_eos[ii], output_table.scattering_xs_nu_eos[i], output_table.scattering_xs_nu_sna_eos[i]);
             //fprintf(fp_nuclei, "%.3f %.3f %.3f %.3f %e %e %d\n", aheavy, zheavy, full_table.aheavy_eos[ii], full_table.zheavy_eos[ii], total_abundance, full_table.xheavy_eos[ii], elements.size());
