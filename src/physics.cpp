@@ -33,6 +33,8 @@ double electron_capture_fit(int A, int Z, double T, double mu_e, double mu_nu, d
     // otherwise, compute full integral
     else
     {
+        if (Q < -80 * T) return 0;
+        if (mu_nu > 30 * T) return 0;
         rate *= electron_capture_ps(T, mu_e, mu_nu, Q-dE);
     }
 
