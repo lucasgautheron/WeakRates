@@ -36,6 +36,7 @@ int main(int argc, const char *argv[])
 
     TH3F *full_histogram = new_ps_histo("full_hist");
     TH3F *restrict_histogram = new_ps_histo("restrict_hist");
+    TH3F *ok_histogram = new_ps_histo("ok");
     
     #undef new_ps_histo
 
@@ -155,9 +156,9 @@ int main(int argc, const char *argv[])
         if(T > 0.01 && T < 5 && nb > 1e-8 && nb < 1e-2 && Y_e > 0.1)
         {
             full_histogram->Fill(log(nb), log(T), Y_e);
-            fprintf(fp_capture, "%.3f %e %.3f %e %e %e %e %.3f\n", T, nb, Y_e, mu_nu_eff, rates_table.elec_rate_tab_eos[i], output_table.elec_rate_fast_eos[i], output_table.elec_rate_tab_eos[i], (float)shell_capt_factor(aheavy, zheavy));
-            fprintf(fp_scattering, "%.3f %e %.3f %e %e %e %e %e %e %e\n", T, nb, Y_e, mu_nu_eff, aheavy, zheavy, full_table.aheavy_eos[ii], full_table.zheavy_eos[ii], output_table.scattering_xs_nu_eos[i], output_table.scattering_xs_nu_sna_eos[i]);
-            fprintf(fp_nuclei, "%.3f %.3f %.3f %.3f %e %e %d\n", aheavy, zheavy, full_table.aheavy_eos[ii], full_table.zheavy_eos[ii], total_abundance, full_table.xheavy_eos[ii], elements.size());
+            //fprintf(fp_capture, "%.3f %e %.3f %e %e %e %e %.3f\n", T, nb, Y_e, mu_nu_eff, rates_table.elec_rate_tab_eos[i], output_table.elec_rate_fast_eos[i], output_table.elec_rate_tab_eos[i], (float)shell_capt_factor(aheavy, zheavy));
+            //fprintf(fp_scattering, "%.3f %e %.3f %e %e %e %e %e %e %e\n", T, nb, Y_e, mu_nu_eff, aheavy, zheavy, full_table.aheavy_eos[ii], full_table.zheavy_eos[ii], output_table.scattering_xs_nu_eos[i], output_table.scattering_xs_nu_sna_eos[i]);
+            //fprintf(fp_nuclei, "%.3f %.3f %.3f %.3f %e %e %d\n", aheavy, zheavy, full_table.aheavy_eos[ii], full_table.zheavy_eos[ii], total_abundance, full_table.xheavy_eos[ii], elements.size());
 
             if(fabs(log(output_table.elec_rate_fast_eos[i]/rates_table.elec_rate_tab_eos[i])) > 2)
             {
@@ -170,8 +171,19 @@ int main(int argc, const char *argv[])
         //continue;
 
     }
+    ok_histogram->Add(full_histogram);
+    ok_histogram->Add(restrict_histogram, -1);
     full_histogram->Write();
     restrict_histogram->Write();
+    ok_histogram->Write();
+
+    ok_histogram->ProjectionX()->Draw();
+    c->SaveAs("output/ok_x.pdf");
+    ok_histogram->ProjectionY()->Draw();
+    c->SaveAs("output/ok_y.pdf");
+    ok_histogram->ProjectionZ()->Draw();
+    c->SaveAs("output/ok_z.pdf");
+
     fclose(fp_scattering);
     fclose(fp_capture);
     fclose(fp_nuclei);
