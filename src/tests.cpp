@@ -27,7 +27,7 @@ int main(int argc, const char *argv[])
     std::cout << "Computing Q values...\n";
     
     TCanvas *c = new TCanvas("c","data",200, 10, 700, 500);
-    TFile *rootfile = new TFile("ouput/histograms.root","RECREATE");
+    TFile *rootfile = new TFile("output/histograms.root","RECREATE");
 
     #define new_ps_histo new TH3F("full_hist", "full_hist", \
                                     100, -10, 5, \
