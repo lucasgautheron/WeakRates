@@ -106,9 +106,10 @@ double electron_capture_ps(double T, double mu_e, double mu_nu, double Q)
         &error);
     gsl_integration_workspace_free(gsl_workspace);
 
+#ifdef DEBUG
     if (ret)
     {
-        printf("ret %d: %e %e %e\n", ret, params[0], params[1], params[2]);
+        printf("ret %d: %e %e %e %s\n", ret, params[0], params[1], params[2], gsl_int_errcode(ret));
     }
     return result;
 }
@@ -139,10 +140,12 @@ double electron_capture_proton(double T, double nb, double mu_e, double mu_nu, d
         &error);
     gsl_integration_workspace_free(gsl_workspace);
 
+#ifdef DEBUG
     if (ret)
     {
         printf("ret %d: %e %e %e %e %s\n", ret, params[0], params[1], params[2], params[3], gsl_int_errcode(ret));
     }
+#endif
     return rate * result;
 }
 
