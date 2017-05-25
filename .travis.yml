@@ -7,7 +7,7 @@ addons:
     packages:
      - gfortran
      - libhdf5-dev
-     - libgsl-dev
+     - libgsl0-dev
      - build-essential
 
 before_install:
