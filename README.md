@@ -1,4 +1,5 @@
-# WeakRates
+# WeakRates [![Build Status](https://travis-ci.org/lucasgautheron/WeakRates.svg?branch=master)](https://travis-ci.org/lucasgautheron/WeakRates)
+
 Weak Interaction rates in Core-Collapse supernovae
 
 ## Installation
