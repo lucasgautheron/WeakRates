@@ -1,6 +1,7 @@
 #include "common.h"
 
 #include "TH3F.h"
+#include "TH1D.h"
 #include "TCanvas.h"
 #include "TFile.h"
 
@@ -177,17 +178,26 @@ int main(int argc, const char *argv[])
     }
     ok_histogram->Add(full_histogram);
     ok_histogram->Add(restrict_histogram, -1);
-    ok_histogram->Divide(full_histogram);
     full_histogram->Write();
     restrict_histogram->Write();
-    ok_histogram->Write();
 
-    ok_histogram->ProjectionX()->Draw();
+    TH1D *projx = (TH1D*) ok_histogram->ProjectionX()->Clone();
+    projx->Divide(full_histogram->ProjectionX());
+    projx->Draw();
     c->SaveAs("output/ok_x.pdf");
-    ok_histogram->ProjectionY()->Draw();
+
+    TH1D *projy = (TH1D*) ok_histogram->ProjectionY()->Clone();
+    projy->Divide(full_histogram->ProjectionY());
+    projy->Draw();
     c->SaveAs("output/ok_y.pdf");
-    ok_histogram->ProjectionZ()->Draw();
+
+    TH1D *projz = (TH1D*) ok_histogram->ProjectionZ()->Clone();
+    projz->Divide(full_histogram->ProjectionZ());
+    projz->Draw();
     c->SaveAs("output/ok_z.pdf");
+
+    ok_histogram->Divide(full_histogram);
+    ok_histogram->Write();
 
     full_histogram->ProjectionX()->Draw();
     c->SaveAs("output/full_x.pdf");
