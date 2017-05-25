@@ -188,11 +188,11 @@ void perform_tests(int argc, const char *argv[])
 {
     if (argc >= 4 && !strcmp(argv[3], "--test"))
     {
-        assert(argc == 9);
-        assert(atoi(argv[5]) == nucl_entries);
-        assert(atoi(argv[6]) == abundance_entries);
-        assert(atoi(argv[7]) == rate_entries);
-        assert(atoi(argv[8]) == full_entries);
+        assert(argc == 8);
+        assert(atoi(argv[4]) == nucl_entries);
+        assert(atoi(argv[5]) == abundance_entries);
+        assert(atoi(argv[6]) == rate_entries);
+        assert(atoi(argv[7]) == full_entries);
         exit(0);
     }
 }
