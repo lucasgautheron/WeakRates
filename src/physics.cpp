@@ -111,6 +111,7 @@ double electron_capture_ps(double T, double mu_e, double mu_nu, double Q)
     {
         printf("ret %d: %e %e %e %s\n", ret, params[0], params[1], params[2], gsl_int_errcode(ret));
     }
+#endif
     return result;
 }
 
