@@ -106,6 +106,12 @@ double electron_capture_ps(double T, double mu_e, double mu_nu, double Q)
         &error);
     gsl_integration_workspace_free(gsl_workspace);
 
+    if (ret)
+    {
+        if (params[1] > 30) return 0; // mu_nu is very large => strong neutrino blocking
+        if (params[2] < -80) return 0; // Q is far below zero => energetically disfavored 
+    }
+
 #ifdef DEBUG
     if (ret)
     {
