@@ -21,6 +21,6 @@ install: ./install.sh
 
 before_script: git-lfs pull
 
-script: ./run data/eos/1 data/eosls220_low.h5 --test 3353 523079
+script: ./run data/eos/1 data/eosls220_low.h5 --test 3353 523079 30830800 2802800
 
 

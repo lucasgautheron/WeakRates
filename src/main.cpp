@@ -1,5 +1,10 @@
 #include "common.h"
 
+int nucl_entries = 0, abundance_entries = 0, 
+    rate_entries = 0, full_entries = 0;
+
+void perform_tests(int argc, const char *argv[]);
+
 int main(int argc, const char *argv[])
 {
 #ifdef DEBUG
@@ -25,7 +30,7 @@ int main(int argc, const char *argv[])
     int entries = 0;
 
     // Read nuclear data (masses)
-    entries = read_nuclear_data("data/mass.mas12");
+    nucl_entries = entries = read_nuclear_data("data/mass.mas12");
     std::cout << "Read " << entries << " nuclear data entries\n";
 
     if(!custom_eos_table)
@@ -45,7 +50,7 @@ int main(int argc, const char *argv[])
 
     // Read abundance data
     std::cout << "Reading abundance data from " << compose_path << "...\n";
-    entries = read_abundance_data(compose_path);
+    abundance_entries = entries = read_abundance_data(compose_path);
     std::cout << "Read " << entries << " nuclear abundance data entries\n";
 
     // Read full EOS data
@@ -61,15 +66,17 @@ int main(int argc, const char *argv[])
     //rates_table.read("data/elec_capt_rate_ls220.h5", &error);
     //rates_table.write("output/sigma_scattering_rate.h5");
 
-    entries = rates_table.size();
+    rate_entries = rates_table.size();
     std::cout << "Read " << entries << " EOS entries (" 
         << rates_table.m_ln_rho << "x" << rates_table.n_ln_t << "x" << rates_table.o_y_e << ")\n";
 
     rates_table.dump();
 
-    entries = full_table.size();
+    full_entries = entries = full_table.size();
     std::cout << "Read " << entries << " EOS entries\n";
     full_table.dump();
+
+    perform_tests(argc, argv);
 
     // Perform calculations
 
@@ -176,3 +183,17 @@ int main(int argc, const char *argv[])
 
     return 0;
 }
+
+void perform_tests(int argc, const char *argv[])
+{
+    if (argc >= 4 && !strcmp(argv[3], "--test"))
+    {
+        assert(argc == 9);
+        assert(atoi(argv[5]) == nucl_entries);
+        assert(atoi(argv[6]) == abundance_entries);
+        assert(atoi(argv[7]) == rate_entries);
+        assert(atoi(argv[8]) == full_entries);
+        exit(0);
+    }
+}
+
