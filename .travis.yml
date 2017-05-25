@@ -9,7 +9,6 @@ addons:
      - libhdf5-dev
      - libgsl0-dev
      - build-essential
-     - root-system-bin
 
 before_install:
  - mkdir -p $HOME/bin
