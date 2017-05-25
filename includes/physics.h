@@ -10,6 +10,19 @@ extern gsl_function electron_capture_ps_func,
 
 int gsl_init();
 
+inline const char *gsl_int_errcode(int ret)
+{
+    switch(ret)
+    {
+        case GSL_EMAXITER: return "the maximum number of subdivisions was exceeded."; break; 	
+        case GSL_EROUND: return "cannot reach tolerance because of roundoff error, or roundoff error was detected in the extrapolation table."; break; 
+        case GSL_ESING: return "a non-integrable singularity or other bad integrand behavior was found in the integration interval."; break; 
+        case GSL_EDIVERGE: return "the integral is divergent, or too slowly convergent to be integrated numerically."; break; 
+        case GSL_EDOM: return "error in the values of the input arguments"; break; 
+        default: return "unknown error";
+    }
+}
+
 inline double average_neutrino_energy(double T, double mu_nu)
 {
     return mu_nu > -10*T ? T*(6*gsl_sf_fermi_dirac_int (3,mu_nu/T)) / (2*gsl_sf_fermi_dirac_int (2,mu_nu/T)) : 3*T;

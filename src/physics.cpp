@@ -141,7 +141,7 @@ double electron_capture_proton(double T, double nb, double mu_e, double mu_nu, d
 
     if (ret)
     {
-        printf("ret %d: %e %e %e %e\n", ret, params[0], params[1], params[2], params[3]);
+        printf("ret %d: %e %e %e %e %s\n", ret, params[0], params[1], params[2], params[3], gsl_int_errcode(ret));
     }
     return rate * result;
 }
