@@ -29,13 +29,13 @@ int main(int argc, const char *argv[])
     TCanvas *c = new TCanvas("c","data",200, 10, 700, 500);
     TFile *rootfile = new TFile("output/histograms.root","RECREATE");
 
-    #define new_ps_histo new TH3F("full_hist", "full_hist", \
+    #define new_ps_histo(name) new TH3F(name, name, \
                                     100, -10, 5, \
                                     100, -2, 6, \
                                     100, 0, 1)
 
-    TH3F *full_histogram = new_ps_histo;
-    TH3F *restrict_histogram = new_ps_histo;
+    TH3F *full_histogram = new_ps_histo("full_hist");
+    TH3F *restrict_histogram = new_ps_histo("restrict_hist");
     
     #undef new_ps_histo
 
