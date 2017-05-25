@@ -9,6 +9,7 @@
 #include <iterator>
 #include <math.h>
 #include <string.h>
+#include <assert.h>
 
 #include <omp.h>
 
