@@ -101,10 +101,15 @@ double electron_capture_ps(double T, double mu_e, double mu_nu, double Q)
     electron_capture_ps_func.params = (void *)params;
     
     gsl_integration_workspace *gsl_workspace = gsl_integration_workspace_alloc(GSL_INT_WP_SIZE);
-    gsl_integration_qagiu (&electron_capture_ps_func, lower_limit,
+    int ret = gsl_integration_qagiu (&electron_capture_ps_func, lower_limit,
         abs_error, rel_error, GSL_INT_WP_SIZE, /*gsl_workspaces[omp_get_thread_num()]*/gsl_workspace, &result,
         &error);
     gsl_integration_workspace_free(gsl_workspace);
+
+    if (ret)
+    {
+        printf("ret %d: %e %e %e\n", ret, params[0], params[1], params[2]);
+    }
     return result;
 }
 
@@ -129,11 +134,15 @@ double electron_capture_proton(double T, double nb, double mu_e, double mu_nu, d
     electron_capture_proton_func.params = (void *)params;
     
     gsl_integration_workspace *gsl_workspace = gsl_integration_workspace_alloc(GSL_INT_WP_SIZE);
-    gsl_integration_qagiu (&electron_capture_proton_func, lower_limit,
+    int ret = gsl_integration_qagiu (&electron_capture_proton_func, lower_limit,
         abs_error, rel_error, GSL_INT_WP_SIZE, /*gsl_workspaces[omp_get_thread_num()]*/gsl_workspace, &result,
         &error);
     gsl_integration_workspace_free(gsl_workspace);
 
+    if (ret)
+    {
+        printf("ret %d: %e %e %e %e\n", ret, params[0], params[1], params[2], params[3]);
+    }
     return rate * result;
 }
 
