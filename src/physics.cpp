@@ -23,9 +23,18 @@ double electron_capture_fit(int A, int Z, double T, double mu_e, double mu_nu, d
 
     double rate = 0.693 * beta/K * pow(T/M_ELECTRON, 5.);
     
-    // gsl fermi integrals include a normalization factor 1/Gamma(j) hence the multiplication by (j-1)!
-    //rate *= 24*gsl_sf_fermi_dirac_int (4,eta) - 2 * chi * 6*gsl_sf_fermi_dirac_int (3,eta) + chi*chi * 2*gsl_sf_fermi_dirac_int (2, eta);
-    rate *= electron_capture_ps(T, mu_e, mu_nu, Q-dE);
+    
+    // if neutrino blocking can be neglected, neglect it.
+    if (mu_nu / T < 2)
+    {
+        // gsl fermi integrals include a normalization factor 1/Gamma(j) hence the multiplication by (j-1)!
+        rate *= 24*gsl_sf_fermi_dirac_int (4,eta) - 2 * chi * 6*gsl_sf_fermi_dirac_int (3,eta) + chi*chi * 2*gsl_sf_fermi_dirac_int (2, eta);
+    }
+    // otherwise, compute full integral
+    else
+    {
+        rate *= electron_capture_ps(T, mu_e, mu_nu, Q-dE);
+    }
 
     return rate;
 }
