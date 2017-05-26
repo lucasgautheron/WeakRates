@@ -54,6 +54,8 @@ inline double nucleus_mass(int A, int Z)
     if(nuclear_table.count(elem)) return nuclear_table[elem]->m;    
     
     nuclear_table[elem] = new nuclear_data(A, Z, mass_formula(A, Z), 0);
+    dbgf("Calculated mass for (A,Z) = (%d, %d): %.3f\n", A, Z, nuclear_table[elem]->m);
+
     return nuclear_table[elem]->m;
 }
 

@@ -22,11 +22,19 @@
 #define H5_USE_16_API
 #include "hdf5.h"
 
+#define max(x, y) ((x)>(y)?(x):(y))
+#define min(x, y) ((x)<(y)?(x):(y))
+
+#ifdef DEBUG
+#define dbgf printf
+#else
+#define dbgf
+#endif
+
 #include "eos.h"
 #include "constants.h"
 #include "nuclear.h"
 #include "physics.h"
 #include "abundances.h"
 
-#define max(x, y) ((x)>(y)?(x):(y))
-#define min(x, y) ((x)<(y)?(x):(y))
+
