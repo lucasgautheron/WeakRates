@@ -87,6 +87,7 @@ int read_abundance_data(const char *path)
             if(!e.nucleus) { printf("Warning: invalid pair in line %d\n", count); break; }
 
             nucleus_to_AZ(e.nucleus, e.A, e.Z);
+            double m = nucleus_mass(e.A, e.Z);
             ab->elements.push_back(e);
         }
         
