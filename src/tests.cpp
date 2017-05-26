@@ -30,14 +30,23 @@ int main(int argc, const char *argv[])
     TCanvas *c = new TCanvas("c","data",200, 10, 700, 500);
     TFile *rootfile = new TFile("output/histograms.root","RECREATE");
 
-    #define new_ps_histo(name) new TH3F(name, name, \
+    #define new_ps_hist(name) new TH3F(name, name, \
                                     100, -20, 10, \
                                     100, -4, 8, \
-                                    100, 0, 1)
+                                    100, 0, 0.5)
 
-    TH3F *full_histogram = new_ps_histo("full_hist");
-    TH3F *restrict_histogram = new_ps_histo("restrict_hist");
-    TH3F *ok_histogram = new_ps_histo("ok");
+    #define new_ps_hist_mu(name) new TH3F(name, name, \
+                                    100, -20, 10, \
+                                    100, -3, 3, \
+                                    100, 0, 0.5)
+
+    TH3F *full_histogram = new_ps_hist("full_hist");
+    TH3F *restrict_histogram = new_ps_hist("restrict_hist");
+    TH3F *ok_histogram = new_ps_hist("ok");
+
+    TH3F *full_histogram_mu = new_ps_hist_mu("full_hist_mu");
+    TH3F *restrict_histogram_mu = new_ps_hist_mu("restrict_hist_mu");
+    TH3F *ok_histogram_mu = new_ps_hist_mu("ok_mu");
     
     #undef new_ps_histo
 
@@ -134,9 +143,9 @@ int main(int argc, const char *argv[])
         
         double aheavy = 0, zheavy = 0;
         for(int j = 0; j < elements.size(); ++j)
-	{
+        {
             int A = elements[j].A, Z = elements[j].Z;
-	    double abundance = elements[j].abundance;
+            double abundance = elements[j].abundance;
 
             
             if(A < 4 || Z < 2 || abundance <= 0) continue;
@@ -145,8 +154,8 @@ int main(int argc, const char *argv[])
 
             total_abundance += abundance;
             
-	}
-	if(total_abundance > 1e-30)
+        }
+        if(total_abundance > 1e-30)
         {
             aheavy /= total_abundance;
             zheavy /= total_abundance;
@@ -155,20 +164,25 @@ int main(int argc, const char *argv[])
         double /*mu_e = degenerate_potential(M_ELECTRON, nb*Y_e),*/ eps_mu = average_neutrino_energy(T, mu_nu_eff);
 
         full_histogram->Fill(log(nb), log(T), Y_e);
+        full_histogram_mu->Fill(log(nb), log(mu_nu_eff/T), Y_e);
+
         if(fabs(log(output_table.elec_rate_fast_eos[i]/rates_table.elec_rate_tab_eos[i])) > 2)
+        {
             restrict_histogram->Fill(log(nb), log(T), Y_e);
+            restrict_histogram_mu->Fill(log(nb), log(mu_nu_eff/T), Y_e);
+        }
 
         if(T > 0.01 && T < 5 && nb > 1e-8 && nb < 1e-2 && Y_e > 0.1)
         {
             
-            //fprintf(fp_capture, "%.3f %e %.3f %e %e %e %e %.3f\n", T, nb, Y_e, mu_nu_eff, rates_table.elec_rate_tab_eos[i], output_table.elec_rate_fast_eos[i], output_table.elec_rate_tab_eos[i], (float)shell_capt_factor(aheavy, zheavy));
-            //fprintf(fp_scattering, "%.3f %e %.3f %e %e %e %e %e %e %e\n", T, nb, Y_e, mu_nu_eff, aheavy, zheavy, full_table.aheavy_eos[ii], full_table.zheavy_eos[ii], output_table.scattering_xs_nu_eos[i], output_table.scattering_xs_nu_sna_eos[i]);
-            //fprintf(fp_nuclei, "%.3f %.3f %.3f %.3f %e %e %d\n", aheavy, zheavy, full_table.aheavy_eos[ii], full_table.zheavy_eos[ii], total_abundance, full_table.xheavy_eos[ii], elements.size());
+            fprintf(fp_capture, "%.3f %e %.3f %e %e %e %e %.3f\n", T, nb, Y_e, mu_nu_eff, rates_table.elec_rate_tab_eos[i], output_table.elec_rate_fast_eos[i], output_table.elec_rate_tab_eos[i], (float)shell_capt_factor(aheavy, zheavy));
+            fprintf(fp_scattering, "%.3f %e %.3f %e %e %e %e %e %e %e\n", T, nb, Y_e, mu_nu_eff, aheavy, zheavy, full_table.aheavy_eos[ii], full_table.zheavy_eos[ii], output_table.scattering_xs_nu_eos[i], output_table.scattering_xs_nu_sna_eos[i]);
+            fprintf(fp_nuclei, "%.3f %.3f %.3f %.3f %e %e %d\n", aheavy, zheavy, full_table.aheavy_eos[ii], full_table.zheavy_eos[ii], total_abundance, full_table.xheavy_eos[ii], elements.size());
 
             if(fabs(log(output_table.elec_rate_fast_eos[i]/rates_table.elec_rate_tab_eos[i])) > 2)
             {
                 //restrict_histogram->Fill(log(nb), log(T), Y_e);
-                //fprintf(fp_debug, "%.3f %e %.3f %e %e %e %e %.3f %.3f %.3f %.3f %.3f\n", T, nb, Y_e, mu_nu_eff, rates_table.elec_rate_tab_eos[i], output_table.elec//_rate_fast_eos[i], output_table.elec_rate_tab_eos[i], (float)shell_capt_factor(aheavy, zheavy), aheavy, zheavy, full_table.aheavy_eos[ii], full_table.zheavy_eos[ii]);
+                fprintf(fp_debug, "%.3f %e %.3f %e %e %e %e %.3f %.3f %.3f %.3f %.3f\n", T, nb, Y_e, mu_nu_eff, rates_table.elec_rate_tab_eos[i], output_table.elec_rate_fast_eos[i], output_table.elec_rate_tab_eos[i], (float)shell_capt_factor(aheavy, zheavy), aheavy, zheavy, full_table.aheavy_eos[ii], full_table.zheavy_eos[ii]);
             }
         }
 
@@ -180,6 +194,11 @@ int main(int argc, const char *argv[])
     ok_histogram->Add(restrict_histogram, -1);
     full_histogram->Write();
     restrict_histogram->Write();
+
+    ok_histogram_mu->Add(full_histogram_mu);
+    ok_histogram_mu->Add(restrict_histogram_mu, -1);
+    full_histogram_mu->Write();
+    restrict_histogram_mu->Write();
 
     TH1D *projx = (TH1D*) ok_histogram->ProjectionX()->Clone();
     projx->Divide(full_histogram->ProjectionX());
@@ -198,6 +217,24 @@ int main(int argc, const char *argv[])
 
     ok_histogram->Divide(full_histogram);
     ok_histogram->Write();
+
+    projx = (TH1D*) ok_histogram_mu->ProjectionX()->Clone();
+    projx->Divide(full_histogram_mu->ProjectionX());
+    projx->Draw();
+    c->SaveAs("output/ok_mu_x.pdf");
+
+    projy = (TH1D*) ok_histogram_mu->ProjectionY()->Clone();
+    projy->Divide(full_histogram_mu->ProjectionY());
+    projy->Draw();
+    c->SaveAs("output/ok_mu_y.pdf");
+
+    projz = (TH1D*) ok_histogram_mu->ProjectionZ()->Clone();
+    projz->Divide(full_histogram_mu->ProjectionZ());
+    projz->Draw();
+    c->SaveAs("output/ok_mu_z.pdf");
+
+    ok_histogram_mu->Divide(full_histogram_mu);
+    ok_histogram_mu->Write();
 
     full_histogram->ProjectionX()->Draw();
     c->SaveAs("output/full_x.pdf");
