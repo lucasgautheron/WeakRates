@@ -14,5 +14,5 @@ set pointsize 0.05
 
 set palette model HSV rgbformulae 3,2,2
 
-plot '../../output/compare_capture.res' u 5:($1<100?$6:1/0):2 every 100 t '' palette, x w l lc rgb 'black' notitle, x*100 w l dashtype 4 lc rgb 'black' notitle, x/100 w l dashtype 4 lc rgb 'black' notitle
+plot '../../output/compare_capture.res' u 5:($1<100?$6:1/0):(log($2)) every 100 t '' palette, x w l lc rgb 'black' notitle, x*100 w l dashtype 4 lc rgb 'black' notitle, x/100 w l dashtype 4 lc rgb 'black' notitle
 set output
